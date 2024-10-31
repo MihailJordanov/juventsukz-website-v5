@@ -5,7 +5,7 @@ import re
 from sqlalchemy import func, extract
 import os
 from models import db, User, Match, UserMatch, UserAchievement, Team, Location, Achievement
-from python_dotenv import load_dotenv
+from dotenv import load_dotenv
 
 load_dotenv()
 
