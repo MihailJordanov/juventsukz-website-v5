@@ -445,7 +445,7 @@ def win_rate():
         for away_team, stats in away_team_stats.items()
     }
 
-    return render_template('winRate.html', overall_win_rate=overall_win_rate, 
+    return render_template('winrate.html', overall_win_rate=overall_win_rate, 
                            location_win_rates=location_win_rates, 
                            away_team_win_rates=away_team_win_rates)
 
