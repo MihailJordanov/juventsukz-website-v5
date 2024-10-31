@@ -107,6 +107,9 @@
                     {% if category == 'info' %}
                         <p class="success">{{ message }}</p>
                     {% endif %}
+                    {% if category == 'danger' %}
+                        <p class="error">{{ message }}</p>
+                    {% endif %}
                 {% endfor %}
             {% endif %}
         {% endwith %}
