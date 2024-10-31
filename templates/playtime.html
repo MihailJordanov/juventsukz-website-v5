@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="/static/icons/ic1.png" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play Time Statistics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Основни стилове */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+        }   
+
+        .background {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transition: opacity 1s ease-in-out;
+            opacity: 0;
+        }
+
+        /* Стилове за контейнера на панела */
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+        }
+
+        /* Стилове за заглавието */
+        h1 {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Панел за диаграмата */
+        .chart-panel {
+            background-color: #e0f7fa;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Стилове за таблицата */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        /* Dropdown стилове */
+        select {
+            padding: 10px;
+            font-size: 1.1em;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Стилове за бутона "Back to Home" */
+        .back-button {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.1em;
+            border-radius: 4px;
+            cursor: pointer;
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            z-index: 1000;
+        }
+
+        .back-button:hover {
+            background-color: #218838;
+        }
+
+        /* Адаптивни стилове */
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+                padding: 15px;
+            }
+            .back-button {
+                padding: 8px 16px;
+                font-size: 1em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                width: 100%;
+                padding: 10px;
+            }
+            .back-button {
+                padding: 6px 12px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background">
+        <div class="container">
+            <h1>Play Time Statistics</h1>
+            
+            <!-- Dropdown за избор на година -->
+            <label for="yearSelector">Select Year:</label>
+            <select id="yearSelector"></select>
+
+            <!-- Панел за диаграмата -->
+            <div class="chart-panel">
+                <canvas id="playTimeChart"></canvas>
+            </div>
+
+            <!-- Таблица със потребителите -->
+            <h2>Users</h2>
+            <table id="usersTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Win Rate</th>
+                        <th>Total Matches</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Потребителите ще бъдат заредени тук -->
+                </tbody>
+            </table>
+
+            <button class="back-button" onclick="window.location.href='{{ url_for('home') }}'">Back to Home</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const images = [
+                '/static/images/bg38.avif',
+                '/static/images/bg41.avif',
+                '/static/images/bg43.jpg'
+            ];
+
+            let currentIndex = 0;
+            const background = document.querySelector('.background');
+
+            function changeBackground() {
+                const newImage = new Image();
+                newImage.src = images[currentIndex];
+                newImage.onload = () => {
+                    background.style.backgroundImage = `url(${images[currentIndex]})`;
+                    background.style.opacity = 1;
+                };
+                background.style.opacity = 0;
+                currentIndex = (currentIndex + 1) % images.length;
+            }
+
+            setInterval(changeBackground, 5000);
+            changeBackground();
+
+            const yearSelector = document.getElementById('yearSelector');
+            const currentYear = new Date().getFullYear();
+            let playTimeChart;
+
+            // Зареждаме списъка с години
+            fetch('/getYears')
+                .then(response => response.json())
+                .then(years => {
+                    years.forEach(year => {
+                        const option = document.createElement('option');
+                        option.value = year;
+                        option.text = year;
+                        yearSelector.appendChild(option);
+                    });
+
+                    if (years.includes(currentYear)) {
+                        yearSelector.value = currentYear;
+                        loadChartData(currentYear);
+                    } else if (years.length > 0) {
+                        loadChartData(years[0]);
+                    }
+                })
+                .catch(error => console.error('Error fetching years:', error));
+
+            // Зареждаме данните за избраната година
+            yearSelector.addEventListener('change', function() {
+                loadChartData(this.value);
+            });
+
+            function loadChartData(year) {
+                fetch(`/getPlayTimeData?year=${year}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const allMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                        const matchCounts = new Array(12).fill(0);
+                        let totalMatches = 0;
+
+                        data.forEach(entry => {
+                            matchCounts[entry.month - 1] = entry.count;
+                            totalMatches += entry.count;
+                        });
+
+                        if (playTimeChart) {
+                            playTimeChart.data.datasets[0].data = matchCounts;
+                            playTimeChart.data.datasets[0].label = `Matches Played in ${year} - Total: ${totalMatches}`;
+                            playTimeChart.update();
+                        } else {
+                            const ctx = document.getElementById('playTimeChart').getContext('2d');
+                            playTimeChart = new Chart(ctx, {
+                                type: 'line',
+                                data: {
+                                    labels: allMonths,
+                                    datasets: [{
+                                        label: `Matches Played in ${year} - Total: ${totalMatches}`,
+                                        data: matchCounts,
+                                        fill: false,
+                                        borderColor: 'rgba(75, 192, 192, 1)',
+                                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                        tension: 0.1
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true,
+                                            ticks: {
+                                                precision: 0
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    })
+                    .catch(error => console.error('Error fetching play time data:', error));
+            }
+
+            // Функция за зареждане на потребителите
+            function loadUsers() {
+                fetch('/getUsers')  // Предполагаемо URL, който връща потребителите
+                    .then(response => response.json())
+                    .then(users => {
+                        const usersTableBody = document.getElementById('usersTable').querySelector('tbody');
+                        usersTableBody.innerHTML = '';  // Изчистване на текущото съдържание
+
+                        users.forEach(user => {
+                            if (user.type > 0) {  // Проверяваме типа на потребителя
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                    <td>${user.id}</td>
+                                    <td>${user.last_name}</td>
+                                    <td>${user.win_rate}</td>
+                                    <td>${user.total_matches}</td>
+                                `;
+                                usersTableBody.appendChild(row);
+                            }
+                        });
+                    })
+                    .catch(error => console.error('Error fetching users:', error));
+            }
+
+            loadUsers();  // Зареждане на потребителите при инициализация
+        });
+    </script>
+</body>
+</html>

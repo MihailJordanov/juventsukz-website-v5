@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="/static/icons/ic1.png" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Stats</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('/static/images/bg30.jpg'); /* Път до фоновото изображение */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            align-items: flex-start; /* Променете на flex-start, за да не центрирате по вертикалата */
+            min-height: 100vh; /* Използвайте min-height вместо height */
+        }
+        .container {
+            width: 80%;
+            max-width: 1200px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px; /* Добавете място между контейнера и диаграмата */
+            overflow-y: auto; /* Добавя скрол бар, ако съдържанието е по-голямо от контейнера */
+        }
+        .chart-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 2em; /* Основен размер на шрифта на заглавието */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            overflow-x: auto; /* Добавя хоризонтален скрол, ако е необходимо */
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-size: 1em; /* Основен размер на шрифта в таблицата */
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .highlight {
+            background-color: lightgreen;
+            font-size: 1.1em; /* Увеличаване на размера на шрифта заHighlighted редове */
+        }
+        .back-button {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.1em;
+            border-radius: 4px;
+            cursor: pointer;
+            position: fixed; /* Фиксира бутона на място */
+            right: 20px; /* Отстояние от долния ръб */
+            bottom: 20px; /* Отстояние от десния ръб */
+        }
+        .back-button:hover {
+            background-color: #218838;
+        }
+        canvas {
+            width: 100%;
+            height: auto;
+        }
+
+        /* Медийни заявки за адаптивност */
+        @media (max-width: 1200px) {
+            .container, .chart-container {
+                width: 90%;
+            }
+            h1 {
+                font-size: 1.8em; /* Намаляване на размера на шрифта на заглавието */
+            }
+            th, td {
+                font-size: 0.9em; /* Намаляване на размера на шрифта в таблицата */
+                padding: 10px; /* Намаляване на отстоянието на клетките */
+            }
+            .highlight {
+                font-size: 1em; /* Намаляване на размера на шрифта заHighlighted редове */
+            }
+        }
+        @media (max-width: 768px) {
+            .container, .chart-container {
+                width: 95%;
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.5em; /* Намаляване на размера на шрифта на заглавието */
+            }
+            th, td {
+                font-size: 0.8em; /* Намаляване на размера на шрифта в таблицата */
+                padding: 8px; /* Намаляване на отстоянието на клетките */
+            }
+            .highlight {
+                font-size: 0.9em; /* Намаляване на размера на шрифта заHighlighted редове */
+            }
+            .back-button {
+                font-size: 1em;
+                padding: 8px 16px;
+            }
+        }
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.2em; /* Намаляване на размера на шрифта на заглавието */
+            }
+            th, td {
+                font-size: 0.7em; /* Намаляване на размера на шрифта в таблицата */
+                padding: 6px; /* Намаляване на отстоянието на клетките */
+            }
+            .highlight {
+                font-size: 0.8em; /* Намаляване на размера на шрифта заHighlighted редове */
+            }
+            .back-button {
+                font-size: 0.9em;
+                padding: 6px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Player Stats</h1>
+        <table id="stats-table">
+            <thead>
+                <tr>
+                    <th>Player</th>
+                    <th>Goals</th>
+                    <th>Assists</th>
+                    <th>Shots</th>
+                    <th>Shots on Target</th>
+                    <th>Passes</th>
+                    <th>Fouls</th>
+                    <th>Yellow Cards</th>
+                    <th>Red Cards</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Данните ще се добавят динамично от JavaScript -->
+            </tbody>
+        </table>
+        <div class="chart-container">
+            <canvas id="goalsChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="assistsChart"></canvas>
+        </div>
+        
+        <button class="back-button" onclick="window.location.href='{{ url_for('home') }}'">Back to Home</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/getStats')
+                .then(response => response.json())
+                .then(stats => {
+                    const tableBody = document.querySelector('#stats-table tbody');
+                    const playerNames = [];
+                    const playerGoals = [];
+                    const playerAssists = [];   
+                    
+                    stats.forEach(user => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${user.first_name} ${user.last_name}</td>
+                            <td>${user.total_goals}</td>
+                            <td>${user.total_assists}</td>
+                            <td>${user.total_shots}</td>
+                            <td>${user.total_shots_on_target}</td>
+                            <td>${user.total_passes}</td>
+                            <td>${user.total_fouls}</td>
+                            <td>${user.total_yellow_cards}</td>
+                            <td>${user.total_red_cards}</td>
+                        `;
+
+                        if (user.is_current_user) {
+                            row.classList.add('highlight');
+                        }
+
+                        tableBody.appendChild(row);
+
+                        // Добавяме данни за диаграмите
+                        playerNames.push(`${user.last_name}`);
+                        playerGoals.push(user.total_goals);
+                        playerAssists.push(user.total_assists);
+                    });
+
+                    // Създаваме диаграмата за головете
+                    const ctxGoals = document.getElementById('goalsChart').getContext('2d');
+                    new Chart(ctxGoals, {
+                        type: 'bar',
+                        data: {
+                            labels: playerNames,
+                            datasets: [{
+                                label: 'Goals',
+                                data: playerGoals,
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                x: {
+                                    beginAtZero: true
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value, index, values) {
+                                            return Number.isInteger(value) ? value : '';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    // Създаваме диаграмата за асистенциите
+                    const ctxAssists = document.getElementById('assistsChart').getContext('2d');
+                    new Chart(ctxAssists, {
+                        type: 'bar',
+                        data: {
+                            labels: playerNames,
+                            datasets: [{
+                                label: 'Assists',
+                                data: playerAssists,
+                                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                                borderColor: 'rgba(153, 102, 255, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                x: {
+                                    beginAtZero: true
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value, index, values) {
+                                            return Number.isInteger(value) ? value : '';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Error fetching stats:', error));
+        });
+    </script>
+</body>
+</html>

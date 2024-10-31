@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <link rel="icon" href="/static/icons/ic1.png" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage User Types</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('./../static/images/bg8.jpg'); /* Добави тук пътя към изображението */
+            background-size: cover; /* Задоволяване на целия фон */
+            background-position: center;
+            color: #333; /* Основен цвят на текста */
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgba(249, 249, 249, 0.9); /* Полупрозрачен фон */
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        .update-button, .back-button {
+            padding: 10px 20px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        .update-button {
+            background-color: #4CAF50;
+        }
+        .back-button {
+            background-color: #007bff;
+        }
+        
+        /* Адаптивен дизайн */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            th, td {
+                padding: 8px;
+            }
+            .update-button, .back-button {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Manage User Types</h2>
+        <form id="user-type-form" method="POST" action="/update_user_types">
+            <table>
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>User Type</th>
+                        <th>User Number</th> 
+                        <th>Title</th> 
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.first_name }} {{ user.last_name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            <select name="user_type_{{ user.id }}">
+                                <option value="0" {% if user.type == 0 %}selected{% endif %}>A fan</option>
+                                <option value="1" {% if user.type == 1 %}selected{% endif %}>Player</option>
+                                <option value="2" {% if user.type == 2 %}selected{% endif %}>Admin</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" name="user_number_{{ user.id }}" value="{{ user.number }}" min="0" max="99" required /> <!-- Input for User Number with range -->
+                        </td>
+                        <td>
+                            <input type="user_title_{{ user.id }}" name="user_title_{{ user.id }}" value="{{ user.title }}" /> <!-- Input for User Number with range -->
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" class="update-button">Save Changes</button>
+        </form>
+        <a href="/" class="back-button">Back</a>
+    </div>
+</body>
+</html>

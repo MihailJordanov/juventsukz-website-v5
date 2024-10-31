@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <link rel="icon" href="/static/icons/ic1.png" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Achievement</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('./../static/images/bg8.jpg');
+            background-size: cover;
+            background-position: center;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgba(249, 249, 249, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .submit-button, .back-button {
+            padding: 10px 20px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        .submit-button {
+            background-color: #4CAF50;
+        }
+        .back-button {
+            background-color: #007bff;
+        }
+        .achievements-list {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        /* Цветове за различните нива на трудност */
+        .bronze {
+            background-color: #cd8032c1; /* Бронзов */
+        }
+        .silver {
+            background-color: #c0c0c0b4; /* Сребърен */
+        }
+        .gold {
+            background-color: #ffd900b9; /* Златен */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Add New Achievement</h2>
+        <form id="add-achievement-form" method="POST" action="/add_achievements">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            
+            <label for="difficulty">Difficulty:</label>
+            <select id="difficulty" name="difficulty" required>
+                <option value="1">Easy</option>
+                <option value="2">Medium</option>
+                <option value="3">Hard</option>
+            </select>
+
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" rows="4" required></textarea>
+
+            <button type="submit" class="submit-button">Add Achievement</button>
+        </form>
+        <a href="/" class="back-button">Back</a>
+    </div>
+
+    <!-- Таблица с всички постижения -->
+    <div class="container achievements-list">
+        <h3>All Achievements</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Difficulty</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for achievement in achievements %}
+                    <tr class="{% if achievement.difficulty == 1 %}bronze{% elif achievement.difficulty == 2 %}silver{% elif achievement.difficulty == 3 %}gold{% endif %}">
+                        <td>{{ achievement.id }}</td>
+                        <td>{{ achievement.name }}</td>
+                        <td>
+                            {% if achievement.difficulty == 1 %} Easy
+                            {% elif achievement.difficulty == 2 %} Medium
+                            {% elif achievement.difficulty == 3 %} Hard
+                            {% endif %}
+                        </td>
+                        <td>{{ achievement.description }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4">No achievements added yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

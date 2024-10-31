@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <link rel="icon" href="{{ url_for('static', filename='icons/ic1.png') }}" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Achievements</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('./../static/images/bg8.jpg');
+            background-size: cover;
+            background-position: center;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgba(249, 249, 249, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative; /* Добавено за позициониране на бутона */
+        }
+        h3 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .bronze {
+            background-color: #cd7f32; /* Бронзов цвят */
+        }
+        .silver {
+            background-color: #c0c0c0; /* Сребърен цвят */
+        }
+        .gold {
+            background-color: #ffd700; /* Златен цвят */
+        }
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            z-index: 1000;
+        }
+        .back-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container achievements-list">
+        <button class="back-btn" onclick="window.location.href='/'">Back</button> <!-- Бутон за обратно -->
+        <h3>All Achievements</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Difficulty</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for achievement in achievements %}
+                    <tr class="{% if achievement.difficulty == 1 %}bronze{% elif achievement.difficulty == 2 %}silver{% elif achievement.difficulty == 3 %}gold{% endif %}">
+                        <td>{{ achievement.id }}</td>
+                        <td>{{ achievement.name }}</td>
+                        <td>
+                            {% if achievement.difficulty == 1 %} Easy
+                            {% elif achievement.difficulty == 2 %} Medium
+                            {% elif achievement.difficulty == 3 %} Hard
+                            {% endif %}
+                        </td>
+                        <td>{{ achievement.description }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4">No achievements added yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="/static/icons/ic1.png" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Album</title>
+    <style>
+        /* Основни стилове */
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('/static/images/your-background-image.jpg'); /* Поставете пътя към изображението за фон */
+            background-size: cover; /* Покрива целия екран */
+            background-position: center; /* Центрира изображението */
+            background-repeat: no-repeat; /* Не повтаря изображението */
+            height: 100vh; /* Височина на тялото - 100% от видимата част на екрана */
+            margin: 0;
+            padding: 0;
+            color: #ffffff; /* Цвят на текста */
+        }
+        .background {
+            background-image: url('/static/images/bg50.jpg'); /* Път към вашето изображение */
+            background-size: cover; /* Покрива целия контейнер */
+            background-position: center; /* Центрира изображението */
+            background-repeat: no-repeat; /* Не повтаря изображението */
+            min-height: 100vh; /* Минимална височина на контейнера */
+            padding: 20px; /* Добавете вътрешни отстояния, ако е необходимо */
+            z-index: -1; /* Поставя фона зад съдържанието */
+        }
+        .album-container {
+            max-width: 800px; /* Максимална ширина на контейнера */
+            margin: 0 auto; /* Центриране на контейнера */
+            padding: 20px; /* Отстояние около контейнера */
+            background-color: rgba(0, 0, 0, 0.7); /* Полупрозрачен фон за контейнера */
+            border-radius: 10px; /* Закръглени ъгли */
+            position: relative; /* Позициониране за бутоните */
+        }
+
+        .back-button {
+            position: absolute; /* Позиционирайте бутона в контейнера */
+            top: 20px; /* Отстояние от горния ръб */
+            left: 20px; /* Отстояние от левия ръб */
+            background-color: #fff; /* Фон на бутона */
+            color: #333; /* Цвят на текста */
+            border: none; /* Без рамка */
+            border-radius: 5px; /* Закръглени ъгли */
+            padding: 10px 15px; /* Отстояние около текста */
+            cursor: pointer; /* Курсор при задържане */
+            font-size: 16px; /* Размер на шрифта */
+            transition: background-color 0.3s; /* Преход за фона при задържане */
+        }
+
+        .back-button:hover {
+            background-color: #ddd; /* Смяна на фона при задържане */
+        }
+
+        .image-item {
+            margin-bottom: 30px; /* Отстояние между изображенията */
+            border: 2px solid #ddd; /* Контур около изображението */
+            border-radius: 10px; /* Закръглени ъгли */
+            overflow: hidden; /* Скриване на излишни части от изображението */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Лека сянка */
+            transition: transform 0.3s; /* Преход за ефекта при задържане */
+        }
+
+        .image-item:hover {
+            transform: scale(1.03); /* Увеличение при задържане на курсора */
+        }
+
+        .image-item img {
+            width: 100%; /* Ширината на изображението заема целия контейнер */
+            height: auto; /* Автоматична височина, за да се запази пропорцията */
+        }
+
+        .image-caption {
+            text-align: center; /* Центриране на текста */
+            margin-top: 10px; /* Отстояние от изображението */
+            font-size: 16px; /* Размер на шрифта */
+            color: #fff; /* Цвят на текста */
+        }
+
+        h1 {
+            text-align: center; /* Центриране на заглавието */
+            margin-bottom: 20px;
+            color: #fff; /* Цвят на заглавието */
+        }
+    </style>
+</head>
+<body>
+    <div class="background">
+    <div class="album-container">
+        <button class="back-button" onclick="window.location.href='/'">Back</button> <!-- Бутон "Назад" -->
+        <h1>Image Album</h1>
+        
+        <!-- Примерни изображения -->
+        <div class="image-item">
+            <img src="/static/images/bg10.jpg" alt="Image 1">
+            <div class="image-caption">Описание на изображение 1</div> <!-- Описание под изображението -->
+        </div>
+        <div class="image-item">
+            <img src="/static/images/bg13.jpg" alt="Image 2">
+            <div class="image-caption">Описание на изображение 2</div> <!-- Описание под изображението -->
+        </div>
+        <div class="image-item">
+            <img src="/static/images/bg14.jpg" alt="Image 3">
+            <div class="image-caption">Описание на изображение 3</div> <!-- Описание под изображението -->
+        </div>
+        <div class="image-item">
+            <img src="/static/images/bg44.jfif" alt="Image 4">
+            <div class="image-caption">Описание на изображение 4</div> <!-- Описание под изображението -->
+        </div>
+        <!-- Добавете още изображения, ако е необходимо -->
+    </div>
+    </div>
+</body>
+</html>

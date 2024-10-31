@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="/static/icons/ic1.png" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Team and Location</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('/static/images/bg30.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .container {
+            width: 80%;
+            max-width: 600px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 2em;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1.1em;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .back-button {
+            background-color: #007bff; /* Син цвят за бутона 'Back' */
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.1em;
+            border-radius: 4px;
+            cursor: pointer;
+            display: block; /* Показва бутона като блоков елемент */
+            margin: 20px auto; /* Центрира бутона */
+            text-align: center; /* Центрира текста в бутона */
+        }
+        .back-button:hover {
+            background-color: #0056b3; /* По-тъмен син цвят при задържане */
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+            .back-button {
+                padding: 8px 16px;
+                font-size: 1em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                width: 100%;
+                padding: 10px;
+            }
+            h1 {
+                font-size: 1.2em;
+            }
+            .back-button {
+                padding: 6px 12px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+
+    <script>
+        // Функция за извличане и показване на отбори
+        async function fetchTeams() {
+            try {
+                const response = await fetch('/getTeams');
+                const teams = await response.json();
+                const teamList = document.getElementById('team-list');
+                teamList.innerHTML = ''; // Изчиства списъка преди добавяне на нови елементи
+
+                if (teams.length > 0) {
+                    teams.forEach(team => {
+                        const li = document.createElement('li');
+                        li.textContent = team;
+                        teamList.appendChild(li);
+                    });
+                } else {
+                    teamList.innerHTML = '<li>Няма налични отбори.</li>';
+                }
+            } catch (error) {
+                console.error('Грешка при извличане на отбори:', error);
+            }
+        }
+
+        // Функция за извличане и показване на локации
+        async function fetchLocations() {
+            try {
+                const response = await fetch('/getLocations');
+                const locations = await response.json();
+                const locationList = document.getElementById('location-list');
+                locationList.innerHTML = ''; // Изчиства списъка преди добавяне на нови елементи
+
+                if (locations.length > 0) {
+                    locations.forEach(location => {
+                        const li = document.createElement('li');
+                        li.textContent = location;
+                        locationList.appendChild(li);
+                    });
+                } else {
+                    locationList.innerHTML = '<li>Няма налични локации.</li>';
+                }
+            } catch (error) {
+                console.error('Грешка при извличане на локации:', error);
+            }
+        }
+
+        // Зареждане на отбори и локации при зареждане на страницата
+        window.onload = function() {
+            fetchTeams();
+            fetchLocations();
+            // Съществуваща логика за валидация и предупреждение...
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Add Team</h1>
+        <form id="add-team-form" action="{{ url_for('add_team_location') }}" method="POST" onsubmit="return validateDifficulty()">
+            <label for="team_name">Team:</label>
+            <input type="text" id="team_name" name="team_name" required>
+
+            <label for="difficulty">Difficulty (1-10):</label>
+            <input type="number" id="difficulty" name="difficulty" min="1" max="10" required>
+
+            <button type="submit">Add Team</button>
+        </form>
+
+        <h1 style="margin-top: 40px;">Add Location</h1>
+        <form id="add-location-form" action="{{ url_for('add_team_location') }}" method="POST">
+            <label for="location_name">Location:</label>
+            <input type="text" id="location_name" name="location_name" required>
+
+            <button type="submit">Add Location</button>
+        </form>
+
+        <h2 style="margin-top: 40px;">Teams</h2>
+        <ul id="team-list">
+            <!-- Отборите ще бъдат динамично добавени тук -->
+        </ul>
+
+        <h2 style="margin-top: 20px;">Locations</h2>
+        <ul id="location-list">
+            <!-- Локациите ще бъдат динамично добавени тук -->
+        </ul>
+
+        <!-- Бутон "Back" -->
+        <a href="/" class="back-button">Back</a>
+    </div>
+</body>
+</html>

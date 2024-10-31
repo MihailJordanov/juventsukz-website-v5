@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="{{ url_for('static', filename='icons/ic1.png') }}" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juventus Kazanluk</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: url('{{ url_for('static', filename='images/bg7.jpg') }}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow-x: hidden;
+        }
+        .container {
+            text-align: center;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            font-size: 3em;
+            color: #000000;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 40px;
+        }
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            padding: 15px 25px;
+            font-size: 1.2em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, left 0.3s ease;
+            z-index: 1000;
+        }
+        .menu-btn:hover {
+            background-color: #0056b3;
+        }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            height: 100%;
+            width: 300px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #ffffff;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+            transition: left 0.5s ease;
+            z-index: 999;
+            overflow-y: auto; /* Позволява скролиране */
+            padding-bottom: 20px; /* Добавя малко пространство в долната част */
+        }
+        .sidebar.open {
+            left: 0;
+        }
+        .sidebar a {
+            display: block;
+            padding: 20px;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 1.2em;
+            border-bottom: 1px solid #444;
+        }
+        .sidebar a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .button_logout {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            transition: background-color 0.3s ease;
+            z-index: 1000;
+        }
+        .button_logout:hover {
+            background-color: #0056b3;
+        }
+        @media (max-width: 768px) {
+            .menu-btn {
+                font-size: 1em;
+                padding: 10px 20px;
+            }
+            .sidebar {
+                width: 250px;
+            }
+            .container {
+                padding: 20px;
+                max-width: 100%;
+            }
+            h1 {
+                font-size: 2.5em;
+            }
+            p {
+                font-size: 1em;
+            }
+        }
+        @media (max-width: 480px) {
+            .menu-btn {
+                font-size: 0.9em;
+                padding: 10px 15px;
+            }
+            .sidebar {
+                width: 200px;
+            }
+            .container {
+                padding: 15px;
+                max-width: 100%;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            p {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Juventus Kazanlak</h1>
+        <p>Welcome to the official site of Juventus Kazanluk. Explore our matches and stay updated!</p>
+    </div>
+    <div id="sidebar" class="sidebar">
+        {% if user_type >= 1 %}
+            <a href="/addMatches">Add Matches</a>
+        {% endif %} 
+        <a href="/matchHistory">Match History</a>
+        <a href="/stats">Stats</a>
+        <a href="/winRate">Win Rate</a>
+        <a href="/playtime">Play Time</a>
+        <a href="/achievements">Achievements</a>
+        <a href="/album">Album</a>
+        {% if user_type >= 1 %}
+            <a href="/profile">My Profile</a>
+            <a href="/add_team_location">Teams & Locations</a>
+        {% endif %}
+        {% if user_type >= 2 %}
+            <a href="/op_users">Op Users</a>
+            <a href="/add_achievements">Add achievements</a>
+        {% endif %}
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+    
+    <button class="menu-btn" onclick="toggleSidebar()">Menu</button>
+
+    <script>
+        function toggleSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            var menuBtn = document.querySelector('.menu-btn');
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                menuBtn.style.left = '20px';
+            } else {
+                sidebar.classList.add('open');
+                menuBtn.style.left = '320px';
+            }
+        }
+    </script>
+</body>
+</html>

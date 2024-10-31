@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="/static/icons/ic1.png" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .signup-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            max-width: 100vw;
+            max-height: 100vh;
+        }
+
+        .signup-container img {
+            width: 25%;
+            height: auto;
+            object-fit: cover;
+            margin: 0;
+        }
+
+        .signup-form-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 50%;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .signup-form {
+            width: 100%;
+            max-width: 400px; /* Максимална ширина за формата */
+        }
+
+        .signup-form div {
+            margin-bottom: 15px;
+        }
+
+        .signup-form label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .signup-form input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box; /* Полетата ще се адаптират според размера на контейнера */
+        }
+
+        .signup-form button {
+            padding: 10px 15px;
+            background-color: #5cb85c;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .signup-form button:hover {
+            background-color: #4cae4c;
+        }
+
+        h1 {
+            font-size: 5em;
+            color: #000000;
+            margin-top: 20px;
+            align-items: center;
+            text-align: center;
+        }
+
+        .login-link {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .login-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .flash-messages {
+            width: 100%;
+            padding: 10px;
+            background-color: #ffcccc;
+            color: #cc0000;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 20px; /* Добавяме отстояние отгоре, за да е по-ниско */
+        }
+
+        /* Медийни заявки за подобряване на responsive дизайна */
+        @media (max-width: 768px) {
+            .signup-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .signup-container img {
+                width: 100%;
+                height: 200px;
+            }
+
+            .signup-form-container {
+                width: 90%;
+            }
+
+            .signup-form {
+                width: 100%;
+            }
+
+            h1 {
+                font-size: 3em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .signup-form-container {
+                width: 100%;
+                padding: 10px;
+            }
+
+            .signup-container img {
+                width: 100%;
+                height: 150px;
+            }
+
+            .signup-form input, .signup-form button {
+                font-size: 1em;
+                padding: 8px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <img src="{{ url_for('static', filename='images/s4.jpg') }}" alt="Left Image">
+        <div class="signup-form-container">
+            <h1>Sign Up</h1>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for message in messages %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            <form class="signup-form" method="POST" action="{{ url_for('signup') }}">
+                <div>
+                    <label for="first_name">First Name</label>
+                    <input type="text" name="first_name" id="first_name" required>
+                </div>
+                <div>
+                    <label for="last_name">Last Name</label>
+                    <input type="text" name="last_name" id="last_name" required>
+                </div>
+                <div>
+                    <label for="email">Email</label>
+                    <input type="email" name="email" id="email" required>
+                </div>
+                <div>
+                    <label for="password">Password</label>
+                    <input type="password" name="password" id="password" required>
+                </div>
+                <div>
+                    <label for="confirm_password">Confirm Password</label>
+                    <input type="password" name="confirm_password" id="confirm_password" required>
+                </div>
+                <button type="submit">Sign Up</button>
+            </form>
+            <div class="login-link">
+                <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+            </div>
+        </div>
+        <img src="{{ url_for('static', filename='images/s4.jpg') }}" alt="Right Image">
+    </div>
+</body>
+</html>

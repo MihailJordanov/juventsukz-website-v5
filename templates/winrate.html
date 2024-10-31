@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="/static/icons/ic1.png" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Win Rate</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('/static/images/bg34.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            background-color: #ffffffcd;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .win-rate {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4CAF50;
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        table, th, td {
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .back-button {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            position: fixed;
+            right: 1rem;
+            bottom: 1rem;
+        }
+
+        .back-button:hover {
+            background-color: #218838;
+        }
+
+        canvas {
+            margin-top: 2rem;
+        }
+
+        /* Добавяне на CSS класове за оцветяване на клетките */
+        .win {
+            background-color: rgba(76, 175, 80, 0.3); /* светло зелено */
+        }
+
+        .lose {
+            background-color: rgba(255, 99, 71, 0.3); /* много светло червено */
+        }
+
+        .draw {
+            background-color: rgba(255, 255, 102, 0.3); /* светло жълто */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Win Rate</h1>
+        <p class="win-rate">Overall Win Rate: {{ '%.2f' % overall_win_rate }}%</p>
+        
+        <!-- Таблицата с win rate по локация -->
+        <table class="location-stats">
+            <thead>
+                <tr>
+                    <th>Location</th>
+                    <th>Total Matches</th>
+                    <th>Wins</th>
+                    <th>Losses</th>
+                    <th>Draws</th>
+                    <th>Win Rate (%)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for location, stats in location_win_rates.items() %}
+                    <tr>
+                        <td>{{ location }}</td>
+                        <td>{{ stats.total_matches }}</td>
+                        <td class="win">{{ stats.wins }}</td>
+                        <td class="lose">{{ stats.losses }}</td>
+                        <td class="draw">{{ stats.draws }}</td>
+                        <td>{{ '%.2f' % stats.win_rate }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Таблицата с win rate по гостуващ отбор -->
+        <table class="away-team-stats">
+            <thead>
+                <tr>
+                    <th>Away Team</th>
+                    <th>Total Matches</th>
+                    <th>Wins</th>
+                    <th>Losses</th>
+                    <th>Draws</th>
+                    <th>Win Rate (%)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for away_team, stats in away_team_win_rates.items() %}
+                    <tr>
+                        <td>{{ away_team }}</td>
+                        <td>{{ stats.total_matches }}</td>
+                        <td class="win">{{ stats.wins }}</td>
+                        <td class="lose">{{ stats.losses }}</td>
+                        <td class="draw">{{ stats.draws }}</td>
+                        <td>{{ '%.2f' % stats.win_rate }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Графиката за win rate по локация -->
+        <canvas id="locationWinRateChart" width="400" height="200"></canvas>
+        
+        <!-- Графиката за win rate по гостуващ отбор -->
+        <canvas id="awayTeamWinRateChart" width="400" height="200"></canvas>
+
+        <button class="back-button" onclick="window.location.href='{{ url_for('home') }}'">Back to Home</button>
+    </div>
+
+    <!-- Добавяне на Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Данни за win rate по локация
+            const locationWinRates = {{ location_win_rates|tojson }};
+            const locations = Object.keys(locationWinRates);
+            const locationWinRatesData = locations.map(location => locationWinRates[location].win_rate);
+
+            // Данни за win rate по гостуващ отбор
+            const awayTeamWinRates = {{ away_team_win_rates|tojson }};
+            const awayTeams = Object.keys(awayTeamWinRates);
+            const awayTeamWinRatesData = awayTeams.map(away_team => awayTeamWinRates[away_team].win_rate);
+
+            // Диаграма за win rate по локация
+            const locationCtx = document.getElementById('locationWinRateChart').getContext('2d');
+            new Chart(locationCtx, {
+                type: 'bar',
+                data: {
+                    labels: locations,
+                    datasets: [{
+                        label: 'Win Rate (%) by Location',
+                        data: locationWinRatesData,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            // Диаграма за win rate по гостуващ отбор
+            const awayTeamCtx = document.getElementById('awayTeamWinRateChart').getContext('2d');
+            new Chart(awayTeamCtx, {
+                type: 'bar',
+                data: {
+                    labels: awayTeams,
+                    datasets: [{
+                        label: 'Win Rate (%) by Away Team',
+                        data: awayTeamWinRatesData,
+                        backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

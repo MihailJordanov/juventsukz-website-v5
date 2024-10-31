@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <link rel="icon" href="/static/icons/ic1.png" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Match</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url('path/to/your/background-image.jpg') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+        }
+        .background {
+            background-image: url('/static/images/bg14.jpg'); /* Път към вашето изображение */
+            background-size: cover; /* Покрива целия контейнер */
+            background-position: center; /* Центрира изображението */
+            background-repeat: no-repeat; /* Не повтаря изображението */
+            min-height: 100vh; /* Минимална височина на контейнера */
+            padding: 20px; /* Добавете вътрешни отстояния, ако е необходимо */
+            z-index: -1; /* Поставя фона зад съдържанието */
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.859); /* Полупрозрачен фон */
+            border-radius: 10px;
+        }       
+        .match-info {
+            padding: 20px;
+        }
+        .match-info label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        
+        .match-info input[type="number"],
+        .match-info input[type="datetime-local"],
+        .match-info select {
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            width: 60%; /* Основна ширина на полетата */
+        }
+        .match-info button {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 300px; /* Ширина на бутона */
+        }
+        .match-info button:hover {
+            background-color: #0056b3;
+        }
+        .user-stats {
+            display: flex;
+            flex-wrap: wrap; /* Позволява на елементите да преминават на следващ ред, ако не се поберат в един ред */
+            gap: 15px; /* Разстояние между секциите за играчи */
+        }
+        .user-section {
+            display: flex;
+            flex-direction: column; /* Подрежда полетата на вертикален ред в рамките на секцията */
+            width: 300px; /* Ширина на секцията за всеки играч */
+        }
+        .user-section label {
+            margin-top: 5px;
+            font-weight: bold;
+        }
+        .user-section input[type="number"] {
+            width: 50%; /* Ширина на полетата за статистики */
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        .back-button {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.1em;
+            border-radius: 4px;
+            cursor: pointer;
+            position: fixed; /* Фиксира бутона на място */
+            right: 20px; /* Отстояние от десния ръб */
+            bottom: 20px; /* Отстояние от долния ръб */
+            transition: all 0.3s ease; /* Анимация за плавно смаляване */
+        }
+        .back-button:hover {
+            background-color: #218838;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center; /* Центриране по хоризонтал */
+            align-items: center; /* Центриране по вертикал (ако контейнерът има височина) */
+            margin-top: 20px; /* Отстояние отгоре за по-добър вид */
+        }
+        .styled-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .styled-button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+        .styled-button:active {
+            background-color: #3e8e41;
+            transform: scale(0.98);
+        }
+        .flash-messages {
+            width: 100%;
+            padding: 10px;
+            background-color: #ffcccc;
+            color: #cc0000;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 20px; /* Добавяме отстояние отгоре, за да е по-ниско */
+        }
+
+        /* Медийна заявка за мобилни устройства */
+        @media (max-width: 768px) {
+            .back-button {
+                padding: 8px 16px; /* По-малки размери на бутона */
+                font-size: 1em;
+                right: 15px; /* Намалено отстояние от десния ръб */
+                bottom: 15px; /* Намалено отстояние от долния ръб */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .back-button {
+                padding: 6px 12px; /* Още по-малки размери за по-малки екрани */
+                font-size: 0.9em;
+                right: 10px; /* Допълнително намаляване на отстоянията */
+                bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background">
+        <div class="container">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for message in messages %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            <form id="match-form" method="POST" action="/addMatches">
+                <div class="match-info">
+                    <h2>Add Match</h2>
+                    
+                        <label for="team_one">Home Team:</label>
+                        <select id="team_one" name="team_one" required>
+                            <option value="Juventus">Juventus</option>
+                        </select>
+
+                        <label for="team_two">Away Team:</label>
+                        <select id="team_two" name="team_two" required>
+                            <option value="" disabled selected>Select an Away Team</option>
+                            <!-- Опции ще бъдат добавени тук чрез JavaScript -->
+                        </select>
+
+                        <label for="team_one_result">Home Team Result:</label>
+                        <input type="number" id="team_one_result" name="team_one_result" min="0" class="short" required>
+
+                        <label for="team_two_result">Away Team Result:</label>
+                        <input type="number" id="team_two_result" name="team_two_result" min="0" class="short" required>
+
+                        <label for="date">Date:</label>
+                        <input type="datetime-local" id="date" name="date" required>
+
+                        <label for="location">Location:</label>
+                        <select id="location" name="location" required>
+                            <option value="" disabled selected>Select a Location</option>
+                            <!-- Опции ще бъдат добавени тук чрез JavaScript -->
+                        </select> 
+                        
+                        
+                        <label for="type">Type:</label>
+                        <select id="type" name="type" required>
+                            <option value="Training">Training</option>
+                            <option value="Official">Official</option>
+                            <option value="Tournament">Tournament</option>
+                            <option value="Friendly">Friendly</option>
+                            <option value="Other">Other</option>
+                        </select>       
+
+
+                </div>
+                <div class="user-stats">
+                    <!-- Статистики на играчи ще бъдат добавени тук от JavaScript -->
+                </div>
+                <br>
+                <div class="button-container">
+                    <button type="submit" id="add-match-button" class="styled-button">Add Match and Save Stats</button>
+                </div>
+                <button class="back-button" onclick="window.location.href='{{ url_for('home') }}'">Back to Home</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var container = document.querySelector('.user-stats');
+            var teamOneResultInput = document.getElementById('team_one_result');
+            var matchForm = document.getElementById('match-form');
+            var awayTeamSelect = document.getElementById('team_two');
+            var locationSelect = document.getElementById('location');
+
+            // Извличане на отбори
+            fetch('/getTeams')
+                .then(response => response.json())
+                .then(teams => {
+                    teams.forEach(team => {
+                        var option = document.createElement('option');
+                        option.value = team; // Името на отбора
+                        option.textContent = team; // Текст за показване
+                        awayTeamSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching teams:', error);
+                    alert('Error occurred while fetching teams.');
+                });
+
+            // Извличане на локации
+            fetch('/getLocations')
+                .then(response => response.json())
+                .then(locations => {
+                    locations.forEach(location => {
+                        var option = document.createElement('option');
+                        option.value = location; // Името на локацията
+                        option.textContent = location; // Текст за показване
+                        locationSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching locations:', error);
+                    alert('Error occurred while fetching locations.');
+                });
+
+
+            // Извличаме потребителите
+            fetch('/getUsers')
+            .then(response => response.json())
+            .then(users => {
+                users.forEach(user => {
+                    if (user.type >= 1) { // Проверка дали типът на потребителя е 1
+                        var userSection = document.createElement('div');
+                        userSection.classList.add('user-section');
+
+                        userSection.innerHTML = `
+                            <h3>${user.last_name}</h3>
+
+                            <label>
+                                <input type="checkbox" name="played_${user.id}" class="played-checkbox" data-user-id="${user.id}" checked>
+                                Played
+                            </label>
+
+                            <label for="goals_${user.id}">Goals:</label>
+                            <input type="number" id="goals_${user.id}" name="goals_${user.id}" class="stats-field" value="0" min="0">
+
+                            <label for="assists_${user.id}">Assists:</label>
+                            <input type="number" id="assists_${user.id}" name="assists_${user.id}" class="stats-field" value="0" min="0">
+
+                            <label for="shots_${user.id}">Shots:</label>
+                            <input type="number" id="shots_${user.id}" name="shots_${user.id}" class="stats-field" value="0" min="0">
+
+                            <label for="shots_on_target_${user.id}">Shots on Target:</label>
+                            <input type="number" id="shots_on_target_${user.id}" name="shots_on_target_${user.id}" class="stats-field" value="0" min="0">
+
+                            <label for="passes_${user.id}">Passes:</label>
+                            <input type="number" id="passes_${user.id}" name="passes_${user.id}" class="stats-field" value="0" min="0">
+
+                            <label for="fouls_${user.id}">Fouls:</label>
+                            <input type="number" id="fouls_${user.id}" name="fouls_${user.id}" class="stats-field" value="0" min="0">
+
+                            <label for="yellow_cards_${user.id}">Yellow Cards:</label>
+                            <input type="number" id="yellow_cards_${user.id}" name="yellow_cards_${user.id}" class="stats-field" value="0" min="0" max="2">
+
+                            <label for="red_cards_${user.id}">Red Cards:</label>
+                            <input type="number" id="red_cards_${user.id}" name="red_cards_${user.id}" class="stats-field" value="0" min="0" max="1">
+                        `;
+
+                        container.appendChild(userSection);
+                    }
+                });
+                
+                // Добавяне на събития за деактивиране на статистиките, ако няма отметка
+                document.querySelectorAll('.played-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        let userId = this.getAttribute('data-user-id');
+                        let goalInput = document.getElementById(`goals_${userId}`);
+                        let assistsInput = document.getElementById(`assists_${userId}`);
+                        let shotsInput = document.getElementById(`shots_${userId}`);
+                        let shots_on_target_Input = document.getElementById(`shots_on_target_${userId}`);
+                        let passesInput = document.getElementById(`passes_${userId}`);
+                        let yellow_cards_Input = document.getElementById(`yellow_cards_${userId}`);
+                        let red_cards_Input = document.getElementById(`red_cards_${userId}`);
+
+                        goalInput.disabled = !this.checked;
+                        assistsInput.disabled = !this.checked;
+                        shotsInput.disabled = !this.checked;
+                        shots_on_target_Input.disabled = !this.checked;
+                        passesInput.disabled = !this.checked;
+                        yellow_cards_Input.disabled = !this.checked;
+                        red_cards_Input.disabled = !this.checked;
+                    });
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching users:', error);
+                alert('Error occurred while fetching users.');
+            });
+
+
+            matchForm.addEventListener('submit', function(event) {
+                let totalGoals = 0;
+                document.querySelectorAll('.played-checkbox:checked').forEach(checkbox => {
+                    let userId = checkbox.getAttribute('data-user-id');
+                    let goals = parseInt(document.getElementById(`goals_${userId}`).value) || 0;
+                    totalGoals += goals;
+                });
+
+                let teamOneResult = parseInt(teamOneResultInput.value) || 0;
+
+                if (totalGoals > teamOneResult) {
+                    event.preventDefault();
+                    alert('Сумата от головете на играчите не може да бъде повече от резултата на домашния отбор.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
