@@ -5,10 +5,13 @@ import re
 from sqlalchemy import func, extract
 import os
 from models import db, User, Match, UserMatch, UserAchievement, Team, Location, Achievement
+from python_dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'juvjuvjuv' 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://misho:1234@localhost/football_stats_five'
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("SQLALCHEMY_DATABASE_URI")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Инициализиране на базата данни
