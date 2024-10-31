@@ -54,11 +54,11 @@ def get_matches():
 
 
 
-@app.route('/matchHistory', methods=['GET', 'POST'])
+@app.route('/matchhistory', methods=['GET', 'POST'])
 def matchHistory():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    return render_template('matchHistory.html')
+    return render_template('matchhistory.html')
 
 
 @app.route('/saveStats', methods=['POST'])
@@ -378,7 +378,7 @@ def add_team_location():
     return render_template('controlldb.html')
 
 
-@app.route('/winRate')
+@app.route('/winrate')
 def win_rate():
     if 'user_id' not in session:
         return redirect(url_for('login'))
