@@ -223,9 +223,9 @@ def add_matches():
                     if(user.max_goals_in_one_match < goals and match_type != "Training"):
                         user.max_goals_in_one_match = goals
                     if(user.max_assists_in_one_match < assists and match_type != "Training"):
-                        user.max_assists_in_one_match  = goals
+                        user.max_assists_in_one_match = assists
                     if(user.max_passes_in_one_match < passes and match_type != "Training"):
-                        user.max_passes_in_one_match   = goals
+                        user.max_passes_in_one_match = passes
 
                     
                     db.session.add(user)  # Добавяме обновения играч в сесията
@@ -596,7 +596,7 @@ def profile():
     if current_user.max_goals >= 777:
         achievements.append(get_achievement_by_id(4)) 
     if current_user.max_goals_in_one_match >= 7:
-        achievements.append(get_achievement_by_id(5)) 
+        achievements.append(get_achievement_by_id(5))
 
 
 

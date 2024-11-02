@@ -19,7 +19,7 @@
             align-items: flex-start;
             min-height: 100vh;
         }
-
+    
         .container {
             width: 90%;
             max-width: 900px;
@@ -30,50 +30,51 @@
             text-align: center;
             margin-top: 2rem;
         }
-
+    
         h1 {
             color: #333;
-            font-size: 2.5rem;
+            font-size: 2rem;
             margin-bottom: 1rem;
         }
-
+    
         .win-rate {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: bold;
             color: #4CAF50;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
-
+    
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 1.5rem;
+            margin-top: 1rem;
             background-color: rgba(255, 255, 255, 0.8);
         }
-
+    
         table, th, td {
             border: 1px solid rgba(0, 0, 0, 0.1);
         }
-
+    
         th, td {
-            padding: 1rem;
+            padding: 0.8rem;
             text-align: left;
+            font-size: 1rem;
         }
-
+    
         th {
             background-color: #4CAF50;
             color: white;
         }
-
+    
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
-
+    
         .back-button {
             background-color: #28a745;
             color: #fff;
             border: none;
-            padding: 0.8rem 1.5rem;
+            padding: 0.8rem 1.2rem;
             font-size: 1rem;
             border-radius: 4px;
             cursor: pointer;
@@ -81,28 +82,38 @@
             right: 1rem;
             bottom: 1rem;
         }
-
+    
         .back-button:hover {
             background-color: #218838;
         }
-
+    
         canvas {
             margin-top: 2rem;
+            max-width: 100%;
         }
-
-        /* Добавяне на CSS класове за оцветяване на клетките */
-        .win {
-            background-color: rgba(76, 175, 80, 0.3); /* светло зелено */
+    
+        .win { background-color: rgba(76, 175, 80, 0.3); }
+        .lose { background-color: rgba(255, 99, 71, 0.3); }
+        .draw { background-color: rgba(255, 255, 102, 0.3); }
+    
+        /* Media queries for responsive adjustments */
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8rem; }
+            .win-rate { font-size: 1.5rem; }
+            th, td { padding: 0.6rem; font-size: 0.9rem; }
+            .container { padding: 1.5rem; margin-top: 1.5rem; }
+            .back-button { font-size: 0.9rem; padding: 0.7rem 1rem; }
         }
-
-        .lose {
-            background-color: rgba(255, 99, 71, 0.3); /* много светло червено */
-        }
-
-        .draw {
-            background-color: rgba(255, 255, 102, 0.3); /* светло жълто */
+    
+        @media (max-width: 480px) {
+            h1 { font-size: 1.6rem; }
+            .win-rate { font-size: 1.3rem; }
+            th, td { padding: 0.5rem; font-size: 0.8rem; }
+            .container { padding: 1rem; margin-top: 1rem; }
+            .back-button { font-size: 0.8rem; padding: 0.5rem 0.8rem; }
         }
     </style>
+    
 </head>
 <body>
     <div class="container">
