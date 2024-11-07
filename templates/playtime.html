@@ -156,7 +156,6 @@
             <table id="usersTable">
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Name</th>
                         <th>Win Rate</th>
                         <th>Total Matches</th>
@@ -286,7 +285,6 @@
                             if (user.type > 0) {  // Проверяваме типа на потребителя
                                 const row = document.createElement('tr');
                                 row.innerHTML = `
-                                    <td>${user.id}</td>
                                     <td>${user.last_name}</td>
                                     <td>${user.win_rate}</td>
                                     <td>${user.total_matches}</td>

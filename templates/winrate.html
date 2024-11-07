@@ -38,8 +38,15 @@
         }
     
         .win-rate {
-            font-size: 1.8rem;
+            font-size: 1rem;
             font-weight: bold;
+            color: #2e6f30;
+            margin-bottom: 1.5rem;
+        }
+
+        .win-rate-without-training {
+            font-size: 1.8rem;
+            font-weight: bold;  
             color: #4CAF50;
             margin-bottom: 1.5rem;
         }
@@ -99,7 +106,8 @@
         /* Media queries for responsive adjustments */
         @media (max-width: 768px) {
             h1 { font-size: 1.8rem; }
-            .win-rate { font-size: 1.5rem; }
+            .win-rate { font-size: 1rem; }
+            .win-rate-without-training { font-size: 1.5rem; }
             th, td { padding: 0.6rem; font-size: 0.9rem; }
             .container { padding: 1.5rem; margin-top: 1.5rem; }
             .back-button { font-size: 0.9rem; padding: 0.7rem 1rem; }
@@ -107,7 +115,8 @@
     
         @media (max-width: 480px) {
             h1 { font-size: 1.6rem; }
-            .win-rate { font-size: 1.3rem; }
+            .win-rate { font-size: 0.7rem; }
+            .win-rate-without-training { font-size: 1.3rem; }
             th, td { padding: 0.5rem; font-size: 0.8rem; }
             .container { padding: 1rem; margin-top: 1rem; }
             .back-button { font-size: 0.8rem; padding: 0.5rem 0.8rem; }
@@ -118,8 +127,8 @@
 <body>
     <div class="container">
         <h1>Win Rate</h1>
-        <p class="win-rate">Overall Win Rate: {{ '%.2f' % overall_win_rate }}%</p>
-        
+        <p class="win-rate-without-training">Overall Win Rate: {{ '%.2f' % overall_win_rate_without_training }}%</p>
+        <p class="win-rate">Overall Win Rate: {{ '%.2f' % overall_win_rate }}%   (With Trainings)</p>
         <!-- Таблицата с win rate по локация -->
         <table class="location-stats">
             <thead>

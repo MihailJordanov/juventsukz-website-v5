@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import re
-from sqlalchemy import func, extract
+from sqlalchemy import func, extract, text
 import os
 from models import db, User, Match, UserMatch, UserAchievement, Team, Location, Achievement
 from dotenv import load_dotenv
@@ -42,6 +42,7 @@ def get_matches():
     matches_list = []
     for match in matches:
         match_data = {
+            'match_id': match.id,
             'team_one': match.team_one,
             'team_two': match.team_two,
             'team_one_result': match.team_one_result,
@@ -388,9 +389,12 @@ def win_rate():
     
     # Изчисляваме общия win rate
     total_wins = sum(1 for match in matches if match.team_one_result > match.team_two_result)
+    total_wins_without_training = sum(1 for match in matches if (match.team_one_result > match.team_two_result and match.type != "Training"))
+    total_trainings  =sum(1 for match in matches if match.type == "Training")
     total_matches = len(matches)
     overall_win_rate = round((total_wins / total_matches * 100), 2) if total_matches > 0 else 0
-    
+    overall_win_rate_without_training = round((total_wins_without_training / (total_matches - total_trainings) * 100), 2) if (total_matches - total_trainings) > 0 else 0
+
     # Изчисляваме win rate по локация
     location_stats = {}
     for match in matches:
@@ -446,6 +450,7 @@ def win_rate():
     }
 
     return render_template('winrate.html', overall_win_rate=overall_win_rate, 
+                           overall_win_rate_without_training=overall_win_rate_without_training,
                            location_win_rates=location_win_rates, 
                            away_team_win_rates=away_team_win_rates)
 
@@ -686,6 +691,31 @@ def achievements():
 
     achievements = Achievement.query.all()
     return render_template('achievements.html', achievements=achievements)
+
+
+@app.route('/getUserMatchDetails/<int:match_id>', methods=['GET'])
+def get_user_match_details(match_id):
+    
+    # Заявката за извличане на всички необходими полета и last_name от User таблицата
+    query = text("""
+        SELECT um.user_id, u.last_name, um.goals, um.assists, um.shots, um.shots_on_target, 
+            um.passes, um.fouls, um.yellow_cards, um.red_cards
+        FROM user_match um
+        JOIN "users" u ON um.user_id = u.id
+        WHERE um.match_id = :match_id
+        ORDER BY um.goals DESC;
+    """)
+    
+    # Изпълнение на заявката с параметър match_id
+    result = db.session.execute(query, {'match_id': match_id})
+    
+    # Преобразуване на резултата в списък от речници
+    details = []
+    for row in result.fetchall():
+        details.append({column: value for column, value in zip(result.keys(), row)})
+    
+    # Връщане на резултата като JSON
+    return jsonify(details)
 
 
 if __name__ == '__main__':

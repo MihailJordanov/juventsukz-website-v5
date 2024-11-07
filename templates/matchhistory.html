@@ -20,7 +20,7 @@
             padding: 0;
             background-color: #f4f4f4;
         }
-        .container {    
+        .container {
             width: 80%;
             margin: 20px auto;
             padding: 20px;
@@ -75,11 +75,71 @@
         .back-button:hover {
             background-color: #218838;
         }
+        .match-detail-row td {
+            padding: 0;
+        }
 
+        .match-details-container {
+            background-color: rgba(255, 255, 255, 0.9); /* Лек фон с прозрачност */
+            border-radius: 10px; /* Заоблени ъгли */
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Лека сянка */
+            font-family: 'Arial', sans-serif;
+            margin-top: 10px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .match-details-container table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em; /* Регулиране на шрифта */
+            box-sizing: border-box; /* Включва padding и border в ширината */
+        }
+        
+        .match-details-container th, .match-details-container td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+            word-wrap: break-word; /* Позволява на текстовете в клетките да се пренасочват на нов ред */
+        }
+
+        .match-details-container th {
+            background-color: #2898a7;
+            color: #fff;
+            font-weight: bold;
+        }
+    
+        .match-details-container td {
+            background-color: #f9f9f9;
+        }
+
+        .match-details-container tbody tr:nth-child(even) {
+            background-color: #f1f1f1;
+        }
+    
+        .match-details-container tbody tr:hover {
+            background-color: #e0f7fa;
+        }
+    
+        .match-details-container td {
+            font-size: 0.9em;
+            color: #333;
+        }
+    
+        .match-details-container h3 {
+            text-align: center;
+            color: #2898a7;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 width: 90%;
-                padding: 15px;
+                padding: 10px;
+                margin-left: 10px;  /* Изместване на контейнера наляво */
+                margin-right: 10px; /* Малко отместване и от дясно */
             }
             h1 {
                 font-size: 1.5em;
@@ -96,8 +156,16 @@
                 padding: 8px 16px;
                 font-size: 1em;
             }
+            .match-details-container table th, .match-details-container table td {
+                font-size: 0.8em; /* Намаляване на шрифта при по-малки екрани */
+                padding: 8px;
+            }
+        
+            .match-details-container h3 {
+                font-size: 1.3em;
+            }
         }
-
+        
         @media (max-width: 480px) {
             .container {
                 width: 100%;
@@ -118,7 +186,16 @@
                 padding: 6px 12px;
                 font-size: 0.9em;
             }
+            .match-details-container table th, .match-details-container table td {
+                font-size: 0.7em; /* Още по-малък шрифт за мобилни устройства */
+                padding: 6px;
+            }
+        
+            .match-details-container h3 {
+                font-size: 1.1em;
+            }
         }
+        
     </style>
 </head>
 <body>
@@ -140,7 +217,7 @@
                         <th>Date</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="matches-table-body">
                     <!-- Данните ще бъдат добавени тук чрез JavaScript -->
                 </tbody>
             </table>
@@ -155,41 +232,53 @@
                 .then(response => response.json())
                 .then(data => {
                     matches = data; // Запазваме мачовете в глобалната променлива
-
+        
                     // Първоначално извеждаме мачовете
                     displayMatches(matches);
                 })
                 .catch(error => console.error('Error fetching matches:', error));
-
-            // Event listener за сортиране по дата
+        
             document.getElementById('sort-data-button').addEventListener('click', function() {
                 sortByDate();
             });
-
-            // Event listener за сортиране по голова разлика
+        
             document.getElementById('sort-goal-diff-button').addEventListener('click', function() {
                 sortByGoalDifference();
             });
+        
+            // Добавяме слушател за клик извън таблицата
+            document.addEventListener('click', function(event) {
+                const matchDetailsRow = document.querySelector('.match-detail-row');
+                const matchesTable = document.getElementById('matches-table');
+                
+                // Ако не е кликнато в таблицата с мачове и има разширена информация, я скриваме
+                if (!matchesTable.contains(event.target) && matchDetailsRow) {
+                    matchDetailsRow.remove();
+                }
+            });
         });
-
+        
         function displayMatches(matches) {
             const tableBody = document.querySelector('#matches-table tbody');
             tableBody.innerHTML = ''; // Изчистваме съдържанието на таблицата
-
+        
             matches.reverse();
             
             matches.forEach(match => {
                 const row = document.createElement('tr');
-                row.innerHTML = `
+        
+                // Използваме match.match_id вместо match.id
+                row.setAttribute('data-match-id', match.match_id);
+        
+                row.innerHTML = ` 
                     <td>${match.team_one}</td>
                     <td>${match.team_two}</td>
                     <td>${match.team_one_result}</td>
                     <td>${match.team_two_result}</td>
                     <td>${match.type}</td>
                     <td>${new Date(match.date).toLocaleDateString('en-GB')}</td>
- 
                 `;
-
+        
                 // Оцветяване на реда според резултата
                 if (match.team_one_result > match.team_two_result) {
                     row.style.backgroundColor = 'lightgreen';
@@ -198,31 +287,108 @@
                 } else {
                     row.style.backgroundColor = 'lightyellow';
                 }
-
+        
+                // Добавяме слушател за кликане върху реда
+                row.addEventListener('click', function() {
+                    const matchId = row.getAttribute('data-match-id'); // Извличаме data-match-id от <tr>
+                    fetchMatchDetails(matchId, row);
+                });
+        
                 tableBody.appendChild(row);
             });
         }
 
         function sortByDate() {
-            // Сортираме мачовете по дата във възходящ ред
             matches.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-            // Извеждаме сортираните мачове
             displayMatches(matches);
         }
 
         function sortByGoalDifference() {
-            // Сортираме мачовете по голова разлика във възходящ ред
             matches.sort((a, b) => {
                 const diffA = Math.abs(a.team_one_result - a.team_two_result);
                 const diffB = Math.abs(b.team_one_result - b.team_two_result);
                 return diffA - diffB;
             });
-
-            // Извеждаме сортираните мачове
             displayMatches(matches);
         }
+
+        let lastSelectedRow = null; // Променлива за последно избрания ред
+
+        function fetchMatchDetails(matchId, matchRow) {
+            // Проверяваме дали има вече отворено поле с информация
+            const existingDetailRow = document.querySelector('.match-detail-row');
+        
+            // Ако има отворено поле с информация, затваряме го
+            if (existingDetailRow) {
+                existingDetailRow.remove(); // Премахваме старото поле
+            }
+        
+            // Ако редът, върху който щракваме, е същият като последния избран ред, премахваме неговото поле
+            if (lastSelectedRow === matchRow) {
+                lastSelectedRow = null; // Няма да имаме отворен ред
+                return; // Няма да извършваме нищо, ако е същият ред
+            }
+        
+            // Ако е нов ред, извършваме заявка за информацията
+            fetch(`/getUserMatchDetails/${matchId}`)
+                .then(response => response.json())
+                .then(details => {
+                    const detailRow = document.createElement('tr');
+                    detailRow.classList.add('match-detail-row');
+                    const detailCell = document.createElement('td');
+                    detailCell.colSpan = 6;
+        
+                    // Създаваме новото съдържание с информация
+                    let detailsTable = `
+                        <div class="match-details-container">
+                            <h3>Match Details</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Player Name</th>
+                                        <th>Goals</th>
+                                        <th>Assists</th>
+                                        <th>Shots</th>
+                                        <th>Shots On Target</th>
+                                        <th>Passes</th>
+                                        <th>Fouls</th>
+                                        <th>Yellow Cards</th>
+                                        <th>Red Cards</th>
+                                    </tr>
+                                </thead>
+                                <tbody>`;
+        
+                    details.forEach(detail => {
+                        detailsTable += `
+                            <tr>
+                                <td>${detail.last_name}</td>
+                                <td>${detail.goals}</td>
+                                <td>${detail.assists}</td>
+                                <td>${detail.shots}</td>
+                                <td>${detail.shots_on_target}</td>
+                                <td>${detail.passes}</td>
+                                <td>${detail.fouls}</td>
+                                <td>${detail.yellow_cards}</td>
+                                <td>${detail.red_cards}</td>
+                            </tr>`;
+                    });
+        
+                    detailsTable += `
+                                </tbody>
+                            </table>
+                        </div>`;
+        
+                    detailCell.innerHTML = detailsTable;
+                    detailRow.appendChild(detailCell);
+                    matchRow.parentNode.insertBefore(detailRow, matchRow.nextSibling);
+        
+                    // Записваме текущия ред като последно избран
+                    lastSelectedRow = matchRow;
+                })
+                .catch(error => console.error('Error fetching match details:', error));
+        }
+        
+
     </script>
-    
 </body>
 </html>
