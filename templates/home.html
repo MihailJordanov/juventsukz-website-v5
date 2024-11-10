@@ -21,6 +21,11 @@
             background-repeat: no-repeat;
             overflow-x: hidden;
         }
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
         .container {
             text-align: center;
             background-color: #ffffff;
@@ -29,6 +34,7 @@
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             max-width: 500px;
             width: 100%;
+            margin-bottom: 20px;
         }
         h1 {
             font-size: 3em;
@@ -100,9 +106,45 @@
             transition: background-color 0.3s ease;
             z-index: 1000;
         }
-        .button_logout:hover {
-            background-color: #0056b3;
+        .button-panel {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap; /* Allows buttons to wrap on smaller screens */
         }
+        .button-panel button {
+            background-size: cover;
+            background-position: center;
+            color: #ffffff;
+            border: none;
+            padding: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+        }
+        .button-panel button:hover {
+            transform: scale(1.1);
+        }
+    
+        /* Button images */
+        .button-ballgame {
+            background-image: url('{{ url_for('static', filename='images/buttonbg5.png') }}');
+        }
+        .button-achievements {
+            background-image: url('{{ url_for('static', filename='images/buttonbg6.jpg') }}');
+        }
+        .button-album {
+            background-image: url('{{ url_for('static', filename='images/buttonbg7.png') }}');
+        }
+
         @media (max-width: 768px) {
             .menu-btn {
                 font-size: 1em;
@@ -119,6 +161,11 @@
                 font-size: 2.5em;
             }
             p {
+                font-size: 1em;
+            }
+            .button-panel button {
+                width: 100px;
+                height: 100px;
                 font-size: 1em;
             }
         }
@@ -140,14 +187,33 @@
             p {
                 font-size: 0.9em;
             }
+            .button-panel {
+                gap: 10px;
+            }
+            .button-panel button {
+                width: 80px;
+                height: 80px;
+                font-size: 0.9em;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Juventus Kazanlak</h1>
-        <p>Welcome to the official site of Juventus Kazanluk. Explore our matches and stay updated!</p>
+    <div class="main-content">
+        <div class="container">
+            <h1>Juventus Kazanlak</h1>
+            <p>Welcome to the official site of Juventus Kazanluk. Explore our matches and stay updated!</p>
+            
+        </div>
+
+        <div class="button-panel">
+            <button class="button-ballgame" onclick="window.location.href='./ballgame'"></button>
+            <button class="button-achievements" onclick="window.location.href='./achievements'"></button>
+            <button class="button-album" onclick="window.location.href='/album'"></button>
+        </div>
     </div>
+
+
     <div id="sidebar" class="sidebar">
         {% if user_type >= 1 %}
             <a href="/addMatches">Add Matches</a>
@@ -156,8 +222,6 @@
         <a href="/stats">Stats</a>
         <a href="/winrate">Win Rate</a>
         <a href="/playtime">Play Time</a>
-        <a href="/achievements">Achievements</a>
-        <a href="/album">Album</a>
         {% if user_type >= 1 %}
             <a href="/profile">My Profile</a>
             <a href="/add_team_location">Teams & Locations</a>
@@ -184,5 +248,6 @@
             }
         }
     </script>
+    
 </body>
 </html>
