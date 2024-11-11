@@ -316,7 +316,7 @@ def signup():
 
         new_user = User(first_name=first_name, last_name=last_name,title="",number=0, email=email, password=generate_password_hash(password, method='pbkdf2:sha256'), type = 0, max_goals = 0,
                         max_goals_in_one_match = 0, max_assists = 0, max_assists_in_one_match = 0, played_matches = 0, win_matches = 0, draw_matches = 0,
-                        max_passes = 0, max_passes_in_one_match = 0, max_hat_tricks = 0)
+                        max_passes = 0, max_passes_in_one_match = 0, max_hat_tricks = 0, max_ball_game_score = 0)
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('login'))
@@ -761,6 +761,58 @@ def get_personal_best():
         return jsonify({'personal_best': user.max_ball_game_score})
     else:
         return jsonify({'error': 'User not found'}), 404
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

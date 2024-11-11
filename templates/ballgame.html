@@ -140,8 +140,8 @@
             }
     
             .ball {
-                width: 60px;
-                height: 60px;
+                width: 70px;
+                height: 70px;
             }
     
             .score {
@@ -251,7 +251,10 @@
                 }
         
                 if (ball.offsetLeft <= ballRadius || ball.offsetLeft >= gameContainer.clientWidth - ballRadius) {
-                    velocityX = -velocityX * 0.5;
+                    if(velocityX == 0){
+                        velocityX = 1;
+                    }
+                    velocityX = -velocityX;
                 }
             }
             requestAnimationFrame(fall);
