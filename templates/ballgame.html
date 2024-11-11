@@ -198,8 +198,8 @@
         const personalBestDisplay = document.getElementById('personal-best');
         const highestScoreDisplay = document.getElementById('highest-score');
         const ballRadius = ball.clientWidth / 2;
-        let gravity = 0.2; // Gravity
-        let bounceForce = -10; // Vertical bounce force
+        let gravity = 0.3; // Gravity
+        let bounceForce = -15; // Vertical bounce force
         let velocityY = 0; // Vertical velocity
         let velocityX = 0; // Horizontal velocity
         let isBouncing = false;
@@ -265,7 +265,7 @@
                 const ballCenterX = ballRect.width / 2;
         
                 velocityY = bounceForce;
-                velocityX = -(clickX - ballCenterX) / 5;
+                velocityX = -(clickX - ballCenterX) / 10    ;
         
                 isBouncing = true;
                 score++;
@@ -280,7 +280,7 @@
                     await savePersonalBest();
                 }
         
-                setTimeout(() => isBouncing = false, 20);
+                setTimeout(() => isBouncing = false, 1);
             }
         }
         
