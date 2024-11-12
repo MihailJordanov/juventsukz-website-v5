@@ -247,6 +247,15 @@
                     ball.style.top = gameContainer.clientHeight - ball.clientHeight + 'px';
                     velocityY = 0;
                     velocityX = 0;
+
+                    if (score > personalBest) {
+                        personalBest = score;
+                        personalBestDisplay.textContent = `Your Personal Best: ${personalBest}`;
+                        
+                        // Save new personal best in the database
+                        savePersonalBest().catch(error => console.error('Error saving personal best:', error));
+                    }
+
                     resetScore();
                 }
         
@@ -273,15 +282,6 @@
                 isBouncing = true;
                 score++;
                 scoreDisplay.textContent = score;
-        
-                // Check if current score exceeds personal best
-                if (score > personalBest) {
-                    personalBest = score;
-                    personalBestDisplay.textContent = `Your Personal Best: ${personalBest}`;
-        
-                    // Save new personal best in the database
-                    await savePersonalBest();
-                }
         
                 setTimeout(() => isBouncing = false, 1);
             }
