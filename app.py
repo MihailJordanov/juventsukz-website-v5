@@ -288,11 +288,11 @@ def signup():
         password = request.form['password']
         confirm_password = request.form['confirm_password']
 
-        if len(first_name) < 3 or not re.match("^[A-Z][a-z]+$", first_name):
+        if len(first_name) < 3 or not re.match("^[A-ZА-Я][a-zа-я]+$", first_name):
             flash('First name must be at least 3 characters long, contain only letters, and start with a capital letter.')
             return redirect(url_for('signup'))
 
-        if len(last_name) < 3 or not re.match("^[A-Z][a-z]+$", last_name):
+        if len(last_name) < 3 or not re.match("^[A-ZА-Я][a-zа-я]+$", last_name):
             flash('Last name must be at least 3 characters long, contain only letters, and start with a capital letter.')
             return redirect(url_for('signup'))
         
