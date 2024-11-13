@@ -205,6 +205,7 @@
         let isBouncing = false;
         let score = 0; // Score counter
         let personalBest = 0; // Personal Best score
+        let isEnd = false;
         
         // Fetching highest score data from Flask server
         async function fetchHighestScore() {
@@ -256,7 +257,8 @@
                         savePersonalBest().catch(error => console.error('Error saving personal best:', error));
                     }
 
-                    resetScore();
+                    isEnd = true;
+                    
                 }
         
                 if (ball.offsetLeft <= ballRadius || ball.offsetLeft >= gameContainer.clientWidth - ballRadius) {
@@ -272,6 +274,13 @@
         // Handle ball click to make it bounce
         async function handleTouchOrClick(event) {
             if (!isBouncing) {
+
+                if(isEnd)
+                {
+                    resetScore();
+                    isEnd = false;
+                }
+
                 const ballRect = ball.getBoundingClientRect();
                 const clickX = event.clientX - ballRect.left;
                 const ballCenterX = ballRect.width / 2;
