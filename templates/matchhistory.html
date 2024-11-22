@@ -233,6 +233,10 @@
                 .then(data => {
                     matches = data; // Запазваме мачовете в глобалната променлива
         
+                    // Сортиране по дата (от най-скорошна към най-стара)
+                    matches.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+
                     // Първоначално извеждаме мачовете
                     displayMatches(matches);
                 })
