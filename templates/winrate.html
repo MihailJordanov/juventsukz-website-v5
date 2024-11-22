@@ -181,6 +181,24 @@
             </tbody>
         </table>
 
+        <!-- Таблицата за играчите -->
+        <table class="player-stats">
+            <thead>
+                <tr>
+                    <th>Player</th>
+                    <th>Total Matches</th>
+                    <th>Wins</th>
+                    <th>Draws</th>
+                    <th>Losses</th>
+                    <th>Win Rate (%)</th>
+                </tr>
+            </thead>
+            <tbody id="playerStatsTable">
+                <!-- Данните ще се добавят тук динамично -->
+            </tbody>
+        </table>
+
+
         <!-- Графиката за win rate по локация -->
         <canvas id="locationWinRateChart" width="400" height="200"></canvas>
         
@@ -193,6 +211,33 @@
     <!-- Добавяне на Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Зареждане на данните за играчите
+            fetch('/getUsers')
+                .then(response => response.json())
+                .then(playerData => {
+                    const playerStatsTable = document.getElementById('playerStatsTable');
+                    playerStatsTable.innerHTML = ''; // Изчистване на таблицата
+        
+                    playerData.forEach(player => {
+                        const row = document.createElement('tr');
+        
+                        row.innerHTML = `
+                            <td>${player.last_name}</td>
+                            <td>${player.played_matches}</td>
+                            <td class="win">${player.win_matches}</td>
+                            <td class="draw">${player.draw_matches}</td>
+                            <td class="lose">${player.lose_matches}</td>
+                            <td>${player.win_rate.toFixed(2)}</td>
+                        `;
+        
+                        playerStatsTable.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error fetching player data:', error));
+        });
+        
+
         document.addEventListener('DOMContentLoaded', function() {
             // Данни за win rate по локация
             const locationWinRates = {{ location_win_rates|tojson }};

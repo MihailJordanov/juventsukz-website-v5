@@ -20,21 +20,37 @@ db.init_app(app)
 
 @app.route('/getUsers')
 def get_users():
-    users = User.query.all()
+    users = User.query.filter(User.type > 0).all()  # Вземаме само потребители с type > 0
     user_data = []
 
     for user in users:
-        win_rate, total_matches = calculate_user_win_rate(user.id)
+        # Изчисляване на win rate
+        played_matches = user.played_matches or 0
+        win_matches = user.win_matches or 0
+        draw_matches = user.draw_matches or 0
+        lose_matches = played_matches - win_matches - draw_matches
+
+        if played_matches > 0:
+            win_rate = round((win_matches / played_matches) * 100, 2)
+        else:
+            win_rate = 0  # Ако няма изиграни мачове, процентът на победи е 0
+
         user_data.append({
             'id': user.id,
             'type': user.type,
             'title': user.title,
             'last_name': user.last_name,
-            'win_rate': win_rate,
-            'total_matches': total_matches
+            'played_matches': played_matches,
+            'win_matches': win_matches,
+            'draw_matches': draw_matches,
+            'lose_matches': lose_matches,
+            'win_rate': win_rate
         })
 
     return jsonify(user_data)
+
+
+
 
 @app.route('/getMatches', methods=['GET'])
 def get_matches():

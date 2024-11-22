@@ -157,8 +157,9 @@
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Win Rate</th>
+                        <th>Win Matches</th>
                         <th>Total Matches</th>
+                        <th>Win Rate</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -286,8 +287,9 @@
                                 const row = document.createElement('tr');
                                 row.innerHTML = `
                                     <td>${user.last_name}</td>
-                                    <td>${user.win_rate}</td>
+                                    <td>${user.win_matches}</td>
                                     <td>${user.total_matches}</td>
+                                    <td>${user.win_rate}</td>
                                 `;
                                 usersTableBody.appendChild(row);
                             }
