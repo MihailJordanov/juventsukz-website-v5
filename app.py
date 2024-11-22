@@ -33,7 +33,7 @@ def get_users():
         if played_matches > 0:
             win_rate = round((win_matches / played_matches) * 100, 2)
         else:
-            win_rate = 0  # Ако няма изиграни мачове, процентът на победи е 0
+            win_rate = 0 
 
         user_data.append({
             'id': user.id,
