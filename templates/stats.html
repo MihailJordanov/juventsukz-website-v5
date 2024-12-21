@@ -61,7 +61,10 @@
         th {
             background-color: #4CAF50;
             color: white;
-            font-weight: bold;
+            font-weight: normal; /* Основен стил за всички заглавия */
+        }
+        .goals-column {
+            font-weight: bold; /* Удебеляване на текста само за колоната Goals */
         }
         tr:hover {
             background-color: #f1f1f1;
@@ -151,7 +154,8 @@
             <thead>
                 <tr>
                     <th>Player</th>
-                    <th>Goals</th>
+                    <th class="goals-column">Goals</th> <!-- Удебелено заглавие на колоната "Goals" -->
+                    <th>Goals (with Trainings)</th>
                     <th>Assists</th>
                     <th>Shots</th>
                     <th>Shots on Target</th>
@@ -189,6 +193,7 @@
                         const row = document.createElement('tr');
                         row.innerHTML = `
                             <td>${user.first_name} ${user.last_name}</td>
+                            <td class="goals-column">${user.goals_in_official_matches}</td> <!-- Добавено удебеляване в тази клетка -->
                             <td>${user.total_goals}</td>
                             <td>${user.total_assists}</td>
                             <td>${user.total_shots}</td>

@@ -2,10 +2,11 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import re
-from sqlalchemy import func, extract, text
+from sqlalchemy.sql import func, extract, text, case
 import os
 from models import db, User, Match, UserMatch, UserAchievement, Team, Location, Achievement
 from dotenv import load_dotenv
+
 
 load_dotenv()
 
@@ -138,8 +139,10 @@ def get_stats():
         func.sum(UserMatch.passes).label('total_passes'),
         func.sum(UserMatch.fouls).label('total_fouls'),
         func.sum(UserMatch.yellow_cards).label('total_yellow_cards'),
-        func.sum(UserMatch.red_cards).label('total_red_cards')
+        func.sum(UserMatch.red_cards).label('total_red_cards'),
+        func.sum(UserMatch.goals).filter(Match.type != 'Training').label('goals_in_official_matches')  # Алтернативен начин
     ).join(UserMatch, User.id == UserMatch.user_id) \
+    .join(Match, UserMatch.match_id == Match.id) \
     .group_by(User.id, User.first_name, User.last_name) \
     .all()
 
@@ -151,6 +154,7 @@ def get_stats():
             'first_name': user.first_name,
             'last_name': user.last_name,
             'total_goals': user.total_goals or 0,
+            'goals_in_official_matches': user.goals_in_official_matches or 0,
             'total_assists': user.total_assists or 0,
             'total_shots': user.total_shots or 0,
             'total_shots_on_target': user.total_shots_on_target or 0,
