@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <link rel="icon" href="/static/icons/ic1.png" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keeper Game</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #7fc1f9;
+            flex-direction: column; /* Струпваме елементите вертикално */
+        }
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        #scoreboard {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px; /* Отстояние между таблото и игровия панел */
+        }
+        #gamePanel {
+            width: 90vw; /* 90% от ширината на екрана */
+            height: 90vh; /* 90% от височината на екрана */
+            max-width: 800px; /* Максимална ширина */
+            max-height: 600px; /* Максимална височина */
+            border: 5px solid #000;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        @media (max-width: 768px) {
+            /* Промяна на размера на таблото за резултати */
+            #scoreboard {
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+        
+            /* Промяна на размера на бутона за връщане */
+            .back-button {
+                top: 15px;
+                left: 15px;
+                font-size: 14px; /* По-малък шрифт за мобилни екрани */
+            }
+        
+            /* Намаляване на размера на игровото поле на по-малки екрани */
+            #gamePanel {
+                width: 85vw; /* Намаляваме ширината на игралния панел */
+                height: 85vh; /* Намаляваме височината */
+            }
+        }
+        
+        @media (max-width: 480px) {
+            /* Още по-малък шрифт за таблото с резултати */
+            #scoreboard {
+                font-size: 18px;
+                margin-bottom: 20px;
+            }
+        
+            /* Още по-малък бутон за връщане */
+            .back-button {
+                top: 10px;
+                left: 10px;
+                font-size: 12px; /* Също по-малък шрифт */
+            }
+        
+            /* Също намаляване на игровото поле на още по-малки екрани */
+            #gamePanel {
+                width: 80vw; /* Намаляваме ширината на игралния панел още повече */
+                height: 80vh; /* Намаляваме височината */
+            }
+        }
+        
+
+    </style>
+</head>
+<body>
+    <a href="/" class="back-button">Back to Home</a>
+    <div id="scoreboard">Goals: 0</div>
+    <div id="gamePanel">
+        <canvas id="gameCanvas"></canvas>
+    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gamePanel = document.getElementById('gamePanel');
+
+        let score = 0; 
+
+
+        // Функция за настройване на размера на платното
+        function resizeCanvas() {
+            canvas.width = gamePanel.clientWidth;
+            canvas.height = gamePanel.clientHeight;
+        }
+
+        // Настройка на платното
+        resizeCanvas();
+
+        // Параметри на играта
+        const ball = {
+            x: canvas.width / 2,
+            y: canvas.height - 250, // По-нагоре спрямо екрана
+            radius: 15,
+            color: 'orange',
+            speedX: 0,
+            speedY: 0,
+            isDragging: false,
+            startX: 0,
+            startY: 0,
+            maxDistance: 100 // Максимално разстояние за засилване
+        };
+
+        const goal = {
+            x: canvas.width / 2 - 150,
+            y: 50,
+            width: 300,
+            height: 20,
+            color: 'green'
+        };
+
+        const goalkeeper = {
+            x: canvas.width / 2 - 50, // Начална позиция на вратаря (по средата на вратата)
+            y: goal.y + 25, // Позиция спрямо височината на вратата
+            width: 50,
+            height: 30,
+            speed: 3, // Скорост на движение
+            color: 'blue'
+        };
+
+        let ballMove = false; // Променлива за проверка дали топката се движи
+
+        // Функция за рисуване на топката
+        function drawBall() {
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fillStyle = ball.color;
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        // Функция за рисуване на вратата
+        function drawGoal() {
+            ctx.fillStyle = goal.color;
+            ctx.fillRect(goal.x, goal.y, goal.width, goal.height);
+        }
+
+        function drawGoalkeeper() {
+            ctx.fillStyle = goalkeeper.color;
+            ctx.fillRect(goalkeeper.x, goalkeeper.y, goalkeeper.width, goalkeeper.height);
+        }
+
+        // Рисуване на всичко
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawGoal();
+            drawBall();
+            drawGoalkeeper();
+            drawArrow();
+        }
+
+        // Функция за рисуване на стрелка
+        function drawArrow() {
+            if (ball.isDragging) {
+                const dx = ball.startX - ball.x;
+                const dy = ball.startY - ball.y;
+                const distance = Math.sqrt(dx ** 2 + dy ** 2);
+                const angle = Math.atan2(dy, dx);
+
+                // Дължина на стрелката пропорционално на разстоянието
+                const arrowLength = Math.min(distance, ball.maxDistance);
+
+                // Рисуване на стрелката
+                ctx.beginPath();
+                ctx.moveTo(ball.x, ball.y);
+                ctx.lineTo(
+                    ball.x + Math.cos(angle) * arrowLength,
+                    ball.y + Math.sin(angle) * arrowLength
+                );
+                ctx.strokeStyle = 'red';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                ctx.closePath();
+            }
+        }
+
+      
+        
+        let goalkeeperDirection = 1; // 1 за движение надясно, -1 за наляво
+
+        function movGoalKeeper() {
+            // Променяме позицията на вратаря спрямо скоростта и посоката
+            goalkeeper.x += goalkeeper.speed * goalkeeperDirection;
+
+            // Проверяваме дали вратарят достига границите на вратата
+            if (goalkeeper.x <= goal.x || goalkeeper.x + goalkeeper.width >= goal.x + goal.width) {
+                // Смяна на посоката
+                goalkeeperDirection *= -1;
+            }
+        }         
+
+
+        let isGoal = false;
+        let isBallTouched = false;
+
+        function update() {
+            if (!ball.isDragging) {
+                ball.x += ball.speedX;
+                ball.y += ball.speedY;
+
+                // Намаляване на скоростта за симулация на триене
+                ball.speedX *= 0.98;
+                ball.speedY *= 0.98;
+
+                // Проверка за движение
+                ballMove = Math.abs(ball.speedX) > 0.1 || Math.abs(ball.speedY) > 0.1;
+
+                // Проверка дали топката е ударила стена
+                if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width || ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) {
+                    isGoal = false;
+                    resetBall(); // Ресетваме топката
+                }
+
+                // Проверка за удари в стени и промяна на посоката
+                if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) {
+                    ball.speedX *= -1; // Обратна посока по X
+                }
+                if (ball.y - ball.radius < 0) {
+                    ball.speedY *= -1; // Обратна посока по Y
+                }
+            }
+
+            // Проверка дали топката е във вратата
+            if (
+                ball.x > goal.x &&
+                ball.x < goal.x + goal.width &&
+                ball.y - ball.radius < goal.y + goal.height
+            ) {
+                isGoal = true; // Топката е вкарала гол
+                resetBall(); // Ресетваме топката след гол
+            }
+
+            // Проверка дали топката е в контакт с вратаря
+            if (
+                ball.x + ball.radius > goalkeeper.x &&
+                ball.x - ball.radius < goalkeeper.x + goalkeeper.width &&
+                ball.y + ball.radius > goalkeeper.y &&
+                ball.y - ball.radius < goalkeeper.y + goalkeeper.height
+            ) {
+                isGoal = false; // Топката удари вратаря, няма гол
+                resetBall();
+            }
+
+            if(ball.x != canvas.width / 2 && ball.y != canvas.height - 250 && !ballMove && !isBallTouched)
+            {
+                isGoal = false;
+                resetBall();
+            }
+        }
+
+        // Ресет на топката
+        function resetBall() {
+            if (isGoal) {
+                score++; // Увеличаваме резултата, ако е вкаран гол
+                scoreboard.textContent = `Goals: ${score}`;
+            } else {
+                score = 0; // Ако не е вкаран гол, зануляваме резултата
+                scoreboard.textContent = `Goals: ${score}`;
+            }
+
+            // Ресетваме топката до началната позиция
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height - 250;
+            ball.speedX = 0;
+            ball.speedY = 0;
+            ballMove = false; // Топката вече не се движи
+        }
+
+        // Събития за мишката
+        canvas.addEventListener('mousedown', (e) => {
+            if (ballMove) return; // Предотвратяване на drag, ако топката се движи
+            isBallTouched = true;
+
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            const dist = Math.sqrt((mouseX - ball.x) ** 2 + (mouseY - ball.y) ** 2);
+            if (dist < ball.radius) {
+                ball.isDragging = true;
+                ball.startX = mouseX;
+                ball.startY = mouseY;
+            }
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (ball.isDragging) {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                isBallTouched = true;
+
+                // Изчисляване на разстоянието между началната и текущата позиция
+                const dx = mouseX - ball.startX;
+                const dy = mouseY - ball.startY;
+                const distance = Math.sqrt(dx ** 2 + dy ** 2);
+
+                // Ограничаване на движението до максимално разстояние
+                if (distance <= ball.maxDistance) {
+                    ball.x = mouseX;
+                    ball.y = mouseY;
+                } else {
+                    const angle = Math.atan2(dy, dx);
+                    ball.x = ball.startX + Math.cos(angle) * ball.maxDistance;
+                    ball.y = ball.startY + Math.sin(angle) * ball.maxDistance;
+                }
+            }
+        });
+
+        canvas.addEventListener('mouseup', (e) => {
+            if (ball.isDragging) {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+
+                const dx = ball.startX - mouseX;
+                const dy = ball.startY - mouseY;
+
+                // Ограничаване на силата на началния удар
+                const distance = Math.sqrt(dx ** 2 + dy ** 2);
+                const forceMultiplier = Math.min(1, distance / ball.maxDistance);
+
+                ball.speedX = dx * (forceMultiplier / 2) * 0.2;
+                ball.speedY = dy * (forceMultiplier / 2) * 0.2;
+
+                ball.isDragging = false;
+                ballMove = true; // Топката започва да се движи
+                isBallTouched = false;
+            }
+        });
+
+        // Събития за тъчскрийн устройства
+        canvas.addEventListener('touchstart', (e) => {
+            if (ballMove) return;
+            isBallTouched = true;
+
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const mouseX = touch.clientX - rect.left;
+            const mouseY = touch.clientY - rect.top;
+
+            const dist = Math.sqrt((mouseX - ball.x) ** 2 + (mouseY - ball.y) ** 2);
+            if (dist < ball.radius) {
+                ball.isDragging = true;
+                ball.startX = mouseX;
+                ball.startY = mouseY;
+            }
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            if (ball.isDragging) {
+                isBallTouched = true;
+                const rect = canvas.getBoundingClientRect();
+                const touch = e.touches[0];
+                const mouseX = touch.clientX - rect.left;
+                const mouseY = touch.clientY - rect.top;
+
+                const dx = mouseX - ball.startX;
+                const dy = mouseY - ball.startY;
+                const distance = Math.sqrt(dx ** 2 + dy ** 2);
+
+                if (distance <= ball.maxDistance) {
+                    ball.x = mouseX;
+                    ball.y = mouseY;
+                } else {
+                    const angle = Math.atan2(dy, dx);
+                    ball.x = ball.startX + Math.cos(angle) * ball.maxDistance;
+                    ball.y = ball.startY + Math.sin(angle) * ball.maxDistance;
+                }
+            }
+        });
+
+        canvas.addEventListener('touchend', (e) => {
+            if (ball.isDragging) {
+                const rect = canvas.getBoundingClientRect();
+                const touch = e.changedTouches[0];
+                const mouseX = touch.clientX - rect.left;
+                const mouseY = touch.clientY - rect.top;
+
+                const dx = ball.startX - mouseX;
+                const dy = ball.startY - mouseY;
+
+                const distance = Math.sqrt(dx ** 2 + dy ** 2);
+                const forceMultiplier = Math.min(1, distance / ball.maxDistance);
+
+                ball.speedX = dx * (forceMultiplier / 2) * 0.2;
+                ball.speedY = dy * (forceMultiplier / 2) * 0.2;
+
+                ball.isDragging = false;
+                ballMove = true;
+                isBallTouched = false;
+            }
+        });
+
+        function gameLoop() {
+            update();
+            movGoalKeeper(); // Добавете движението на вратаря
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        gameLoop();
+    </script>
+</body>
+</html>

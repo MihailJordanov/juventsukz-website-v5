@@ -145,7 +145,7 @@
             background-image: url('{{ url_for('static', filename='images/buttonbg8.png') }}');
         }
         .button-achievements {
-            background-image: url('{{ url_for('static', filename='images/buttonbg9.png') }}');
+            background-image: url('{{ url_for('static', filename='images/buttonbg11.png') }}');
         }
         .button-album {
             background-image: url('{{ url_for('static', filename='images/buttonbg10.png') }}');
@@ -215,7 +215,7 @@
     
         <div class="button-panel">
             <button class="button-ballgame" onclick="window.location.href='./ballgame'"></button>
-            <button class="button-achievements" onclick="window.location.href='./achievements'"></button>
+            <button class="button-achievements" onclick="window.location.href='./keepergame'"></button>
             <button class="button-album" onclick="window.location.href='/album'"></button>
         </div>
     </div>
@@ -229,6 +229,7 @@
         <a href="/stats">Stats</a>
         <a href="/winrate">Win Rate</a>
         <a href="/playtime">Play Time</a>
+        <a href="/achievements">Achievements</a>
         {% if user_type >= 1 %}
             <a href="/profile">My Profile</a>
             <a href="/add_team_location">Teams & Locations</a>

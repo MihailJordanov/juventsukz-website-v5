@@ -747,6 +747,17 @@ def ballgame():
     return render_template('ballgame.html', user_type=current_user.type)
 
 
+@app.route('/keepergame', methods=['GET'])
+def keeperGame():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    current_user = get_current_user()
+    if current_user is None:
+        return redirect(url_for('login')) 
+    
+    return render_template('goalkeepergame.html')
+
 
 
 @app.route('/getHighestScore')
