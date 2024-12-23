@@ -216,7 +216,7 @@
             y: goal.y + 50, // Позиция спрямо височината на вратата
             width:  50,
             height: 30,
-            speed: 3, // Скорост на движение
+            speed: 4, // Скорост на движение
             image: new Image(), // Добавяме ново изображение за вратаря
         };
         goalkeeper.image.src = '/static/images/goalkeeper1.png';
@@ -390,46 +390,46 @@
                 // Проверка за промяна на изображението и скоростта на вратаря
                 if (score == 10) {
                     goalkeeper.image.src = '/static/images/goalkeeper2.png'; 
-                    goalkeeper.speed = 4; 
+                    goalkeeper.speed = 5; 
                 }
                 else if (score == 20)
                 {
                     goalkeeper.image.src = '/static/images/goalkeeper3.png'; 
-                    goalkeeper.speed = 5; 
+                    goalkeeper.speed = 6; 
                 }
                 else if (score == 30)
                 {
                     goalkeeper.image.src = '/static/images/goalkeeper4.png'; 
-                    goalkeeper.speed = 6; 
+                    goalkeeper.speed = 7; 
                 }
                 else if (score == 40)
                 {
                     goalkeeper.image.src = '/static/images/goalkeeper5.png'; 
-                    goalkeeper.speed = 4; 
+                    goalkeeper.speed = 5; 
                     goalkeeper.width = 70;
                 }
                 else if (score == 50)
                 {
                     goalkeeper.image.src = '/static/images/goalkeeper6.png'; 
-                    goalkeeper.speed = 4; 
+                    goalkeeper.speed = 6; 
                     goalkeeper.width = 90
                 }
                 else if (score == 60)
                 {
                     goalkeeper.image.src = '/static/images/goalkeeper7.png'; 
-                    goalkeeper.speed = 5; 
+                    goalkeeper.speed = 7; 
                     goalkeeper.width = 80
                 }
                 else if (score == 70)
                 {
                     goalkeeper.image.src = '/static/images/goalkeeper8.png'; 
-                    goalkeeper.speed = 5; 
+                    goalkeeper.speed = 7; 
                     goalkeeper.width = 100
                 }
                 else if (score == 80)
                 {
                     goalkeeper.image.src = '/static/images/goalkeeper9.png'; 
-                    goalkeeper.speed = 4; 
+                    goalkeeper.speed = 5; 
                     goalkeeper.width = 150
                 }
             } else {
@@ -447,7 +447,7 @@
                 
                 // Връщане към начално изображение и скорост
                 goalkeeper.image.src = '/static/images/goalkeeper1.png';
-                goalkeeper.speed = 3;
+                goalkeeper.speed = 4;
                 goalkeeper.width = 50;
             }
         
