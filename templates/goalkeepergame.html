@@ -55,6 +55,20 @@
             height: 100%;
         }
 
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+            100% { transform: translateX(0); }
+        }
+        
+        .goal-hit {
+            animation: shake 0.5s ease;
+        }
+        
+
+
         @media (max-width: 768px) {
             /* Промяна на размера на таблото за резултати */
             #scoreboard {
@@ -127,53 +141,81 @@
         const ball = {
             x: canvas.width / 2,
             y: canvas.height - 250, // По-нагоре спрямо екрана
-            radius: 15,
-            color: 'orange',
+            radius: 25,
             speedX: 0,
             speedY: 0,
             isDragging: false,
             startX: 0,
             startY: 0,
-            maxDistance: 100 // Максимално разстояние за засилване
+            maxDistance: 100, // Максимално разстояние за засилване
+            image: new Image() 
         };
+        ball.image.src = '/static/images/ball1.png';
 
         const goal = {
             x: canvas.width / 2 - 150,
-            y: 50,
+            y: 10,
             width: 300,
-            height: 20,
-            color: 'green'
+            height: 60,
+            image: new Image() 
         };
+        goal.image.src = '/static/images/footballgoal2.png';
 
         const goalkeeper = {
             x: canvas.width / 2 - 50, // Начална позиция на вратаря (по средата на вратата)
-            y: goal.y + 25, // Позиция спрямо височината на вратата
+            y: goal.y + 50, // Позиция спрямо височината на вратата
             width: 50,
             height: 30,
             speed: 3, // Скорост на движение
-            color: 'blue'
+            image: new Image(), // Добавяме ново изображение за вратаря
         };
+        goalkeeper.image.src = '/static/images/goalkeeper1.png';
 
         let ballMove = false; // Променлива за проверка дали топката се движи
 
         // Функция за рисуване на топката
         function drawBall() {
-            ctx.beginPath();
-            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-            ctx.fillStyle = ball.color;
-            ctx.fill();
-            ctx.closePath();
+            const ctx = canvas.getContext('2d');
+            
+            // Проверяваме дали изображението е заредено
+            if (ball.image.complete) {
+                ctx.drawImage(ball.image, ball.x - ball.radius, ball.y - ball.radius, ball.radius * 2, ball.radius * 2);
+            } else {
+                // Ако изображението не е заредено, можем да нарисуваме запълващ кръг като резервен вариант
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'orange'; // Променете с цвят на топката по избор
+                ctx.fill();
+                ctx.closePath();
+            }
         }
+        
 
         // Функция за рисуване на вратата
         function drawGoal() {
-            ctx.fillStyle = goal.color;
-            ctx.fillRect(goal.x, goal.y, goal.width, goal.height);
+            const ctx = canvas.getContext('2d');
+            
+            // Проверяваме дали изображението е заредено
+            if (goal.image.complete) {
+                ctx.drawImage(goal.image, goal.x, goal.y, goal.width, goal.height);
+            } else {
+                // Ако изображението не е заредено, рисуваме правоъгълник за вратаря
+                ctx.fillStyle = 'blue'; // Може да промениш цвета по избор
+                ctx.fillRect(goal.x, goal.y, goal.width, goal.height);
+            }
         }
 
         function drawGoalkeeper() {
-            ctx.fillStyle = goalkeeper.color;
-            ctx.fillRect(goalkeeper.x, goalkeeper.y, goalkeeper.width, goalkeeper.height);
+            const ctx = canvas.getContext('2d');
+            
+            // Проверяваме дали изображението е заредено
+            if (goalkeeper.image.complete) {
+                ctx.drawImage(goalkeeper.image, goalkeeper.x, goalkeeper.y, goalkeeper.width, goalkeeper.height);
+            } else {
+                // Ако изображението не е заредено, рисуваме правоъгълник за вратаря
+                ctx.fillStyle = 'blue'; // Може да промениш цвета по избор
+                ctx.fillRect(goalkeeper.x, goalkeeper.y, goalkeeper.width, goalkeeper.height);
+            }
         }
 
         // Рисуване на всичко
@@ -287,7 +329,7 @@
         // Ресет на топката
         function resetBall() {
             if (isGoal) {
-                score++; // Увеличаваме резултата, ако е вкаран гол
+                score++;
                 scoreboard.textContent = `Goals: ${score}`;
             } else {
                 score = 0; // Ако не е вкаран гол, зануляваме резултата
