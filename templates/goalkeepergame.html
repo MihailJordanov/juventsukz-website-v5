@@ -13,9 +13,9 @@
             align-items: center;
             height: 100vh;
             background-color: #7fc1f9;
-            flex-direction: column; /* Струпваме елементите вертикално */
-            overflow: hidden; /* Забрана на превъртането */
-            touch-action: none; /* Изключване на стандартните жестове за докосване */
+            flex-direction: column;
+            overflow: hidden;
+            touch-action: none;
         }
         .back-button {
             position: absolute;
@@ -34,13 +34,13 @@
         #scoreboard {
             font-size: 24px;
             font-weight: bold;
-            margin-bottom: 10px; /* Отстояние между таблото и игровия панел */
+            margin-bottom: 10px;
         }
         #gamePanel {
-            width: 90vw; /* 90% от ширината на екрана */
-            height: 90vh; /* 90% от височината на екрана */
-            max-width: 800px; /* Максимална ширина */
-            max-height: 600px; /* Максимална височина */
+            width: 90vw;
+            height: 90vh;
+            max-width: 800px;
+            max-height: 600px;
             border: 5px solid #000;
             position: relative;
             display: flex;
@@ -53,65 +53,11 @@
             display: block;
             width: 100%;
             height: 100%;
+            border: 2px solid #000;
+            background-image: url('/static/images/pitchBG1.png'); /* Променете пътя към изображението */
+            background-size: cover; /* Ще покрие целия канвас */
+            background-position: center; /* Центрира изображението */
         }
-
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            50% { transform: translateX(10px); }
-            75% { transform: translateX(-10px); }
-            100% { transform: translateX(0); }
-        }
-        
-        .goal-hit {
-            animation: shake 0.5s ease;
-        }
-        
-
-
-        @media (max-width: 768px) {
-            /* Промяна на размера на таблото за резултати */
-            #scoreboard {
-                font-size: 20px;
-                margin-bottom: 15px;
-            }
-        
-            /* Промяна на размера на бутона за връщане */
-            .back-button {
-                top: 15px;
-                left: 15px;
-                font-size: 14px; /* По-малък шрифт за мобилни екрани */
-            }
-        
-            /* Намаляване на размера на игровото поле на по-малки екрани */
-            #gamePanel {
-                width: 85vw; /* Намаляваме ширината на игралния панел */
-                height: 85vh; /* Намаляваме височината */
-            }
-        }
-        
-        @media (max-width: 480px) {
-            /* Още по-малък шрифт за таблото с резултати */
-            #scoreboard {
-                font-size: 18px;
-                margin-bottom: 20px;
-            }
-        
-            /* Още по-малък бутон за връщане */
-            .back-button {
-                top: 10px;
-                left: 10px;
-                font-size: 12px; /* Също по-малък шрифт */
-            }
-        
-            /* Също намаляване на игровото поле на още по-малки екрани */
-            #gamePanel {
-                width: 80vw; /* Намаляваме ширината на игралния панел още повече */
-                height: 80vh; /* Намаляваме височината */
-            }
-        }
-        
-
     </style>
 </head>
 <body>
@@ -120,22 +66,25 @@
     <div id="gamePanel">
         <canvas id="gameCanvas"></canvas>
     </div>
+
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const gamePanel = document.getElementById('gamePanel');
 
-        let score = 0; 
+        let score = 0;
 
-
-        // Функция за настройване на размера на платното
+        // Настройка на размера на канваса
         function resizeCanvas() {
             canvas.width = gamePanel.clientWidth;
             canvas.height = gamePanel.clientHeight;
         }
 
-        // Настройка на платното
         resizeCanvas();
+
+
+
+
 
         // Параметри на играта
         const ball = {
