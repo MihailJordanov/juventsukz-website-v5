@@ -19,8 +19,8 @@
         }
         .back-button {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            top: 10px;  /* Позиция малко по-нагоре */
+            left: 10px; /* Позиция малко по-дясно */
             background-color: #333;
             color: white;
             padding: 10px 20px;
@@ -64,6 +64,25 @@
             font-size: 18px;
             text-align: center;
         }
+
+        @media (max-width: 768px) {
+            .back-button {
+                top: 5px;  /* Позиционирай го още по-нагоре */
+                left: 5px; /* Позиционирай го още по-дясно */
+                font-size: 14px;  /* По-малък текст */
+                padding: 8px 16px;  /* По-малки паддинги */
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .back-button {
+                top: 5px;  /* Позиционирай го още по-нагоре */
+                left: 5px; /* Позиционирай го още по-дясно */
+                font-size: 8px;  /* Още по-малък текст за мобилни устройства */
+                padding: 6px 12px;  /* Още по-малки паддинги */
+            }
+        }
+        
     </style>
 </head>
 <body>
