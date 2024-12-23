@@ -336,7 +336,7 @@ def signup():
 
         new_user = User(first_name=first_name, last_name=last_name,title="",number=0, email=email, password=generate_password_hash(password, method='pbkdf2:sha256'), type = 0, max_goals = 0,
                         max_goals_in_one_match = 0, max_assists = 0, max_assists_in_one_match = 0, played_matches = 0, win_matches = 0, draw_matches = 0,
-                        max_passes = 0, max_passes_in_one_match = 0, max_hat_tricks = 0, max_ball_game_score = 0)
+                        max_passes = 0, max_passes_in_one_match = 0, max_hat_tricks = 0, max_ball_game_score = 0, max_keeper_game_score=0)
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('login'))
@@ -760,8 +760,8 @@ def keeperGame():
 
 
 
-@app.route('/getHighestScore')
-def get_highest_score():
+@app.route('/getHighestScoreBallGame')
+def get_highest_ball_game_score():
     # Извличане на потребителя с най-високия резултат
     highest_score_user = User.query.order_by(User.max_ball_game_score.desc()).first()
     if highest_score_user:
@@ -774,10 +774,10 @@ def get_highest_score():
             'highest_score': 0,
             'user_name': 'No users found'
         })
+        
     
-
-@app.route('/getPersonalBest', methods=['GET'])
-def get_personal_best():
+@app.route('/getPersonalBestBallGame', methods=['GET'])
+def get_personal_ball_game_best():
     # Вземи user_id от сесията
     user_id = session.get('user_id')
     
@@ -794,69 +794,8 @@ def get_personal_best():
         return jsonify({'error': 'User not found'}), 404
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@app.route('/getUserId', methods=['GET'])
-def get_user_id():
-    user_id = session.get('user_id')  # Вземи user_id от сесията
-    if user_id:
-        return jsonify({'user_id': user_id})
-    else:
-        return jsonify({'error': 'User not logged in'}), 400
-
-@app.route('/savePersonalBest', methods=['POST'])
-def save_personal_best():
+@app.route('/savePersonalBestBallGame', methods=['POST'])
+def save_personal_best_ball_game():
     data = request.get_json()
     user_id = data.get('user_id')
     personal_best = data.get('personal_best')
@@ -876,6 +815,76 @@ def save_personal_best():
             return jsonify({'message': 'No update needed, personal best is not exceeded'}), 200
     else:
         return jsonify({'error': 'User not found'}), 404
+
+
+@app.route('/getHighestScoreKeeperGame')
+def get_highest_keeper_game_score():
+    # Извличане на потребителя с най-високия резултат
+    highest_score_user = User.query.order_by(User.max_keeper_game_score.desc()).first()
+    if highest_score_user:
+        return jsonify({
+            'highest_score': highest_score_user.max_keeper_game_score,
+            'user_name': f"{highest_score_user.last_name}"
+        })
+    else:
+        return jsonify({
+            'highest_score': 0,
+            'user_name': 'No users found'
+        })
+
+
+
+@app.route('/getPersonalBestKeeperGame', methods=['GET'])
+def get_personal_keeper_game_best():
+    # Вземи user_id от сесията
+    user_id = session.get('user_id')
+    
+    if not user_id:
+        return jsonify({'error': 'User not logged in'}), 400
+    
+    # Намери потребителя в базата данни чрез ID
+    user = User.query.get(user_id)
+    
+    if user:
+        # Върни max_ball_game_score на потребителя
+        return jsonify({'personal_best': user.max_keeper_game_score})
+    else:
+        return jsonify({'error': 'User not found'}), 404
+
+
+
+@app.route('/savePersonalBestKeeperGame', methods=['POST'])
+def save_personal_best_keeper_game():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    personal_best = data.get('personal_best')
+    
+    if not user_id or personal_best is None:
+        return jsonify({'error': 'Invalid data'}), 400
+    
+    # Обнови личния рекорд на потребителя в базата данни
+    user = User.query.get(user_id)
+    if user:
+        # Ако новият резултат е по-добър от текущия, актуализирай max_keeper_game_score
+        if personal_best > user.max_keeper_game_score:
+            user.max_keeper_game_score = personal_best
+            db.session.commit()
+            return jsonify({'message': 'Personal Best updated'})
+        else:
+            return jsonify({'message': 'No update needed, personal best is not exceeded'}), 200
+    else:
+        return jsonify({'error': 'User not found'}), 404
+
+
+
+
+@app.route('/getUserId', methods=['GET'])
+def get_user_id():
+    user_id = session.get('user_id')  # Вземи user_id от сесията
+    if user_id:
+        return jsonify({'user_id': user_id})
+    else:
+        return jsonify({'error': 'User not logged in'}), 400
 
 
 

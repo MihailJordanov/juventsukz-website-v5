@@ -210,7 +210,7 @@
         // Fetching highest score data from Flask server
         async function fetchHighestScore() {
             try {
-                const response = await fetch('/getHighestScore');
+                const response = await fetch('/getHighestScoreBallGame');
                 const data = await response.json();
                 const highestScore = data.highest_score;
                 const userName = data.user_name;
@@ -306,7 +306,7 @@
         async function savePersonalBest() {
             try {
                 const userId = await getUserIdFromSession();  // Get user id from session
-                const response = await fetch('/savePersonalBest', {
+                const response = await fetch('/savePersonalBestBallGame', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -341,7 +341,7 @@
         // Function to fetch personal best
         async function fetchPersonalBest() {
             try {
-                const response = await fetch('/getPersonalBest');
+                const response = await fetch('/getPersonalBestBallGame');
                 const data = await response.json();
         
                 if (data.personal_best !== undefined) {

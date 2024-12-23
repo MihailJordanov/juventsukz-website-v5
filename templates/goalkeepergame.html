@@ -58,10 +58,26 @@
             background-size: cover; /* Ще покрие целия канвас */
             background-position: center; /* Центрира изображението */
         }
+        .stats-container {
+            margin-bottom: 20px;
+            color: rgb(0, 0, 0);
+            font-size: 18px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <a href="/" class="back-button">Back to Home</a>
+
+    <div class="stats-container">
+        <div>
+            <h4 id="highest-score">Highest Goals: Loading...</h4>
+        </div>
+        <div>
+            <h4 id="personal-best">Your Personal Best: Loading...</h4>
+        </div>
+    </div>
+
     <div id="scoreboard">Goals: 0</div>
     <div id="gamePanel">
         <canvas id="gameCanvas"></canvas>
@@ -71,8 +87,78 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const gamePanel = document.getElementById('gamePanel');
+        const personalBestDisplay = document.getElementById('personal-best');
+        const highestScoreDisplay = document.getElementById('highest-score');
 
+        let personalBest = 0;
         let score = 0;
+
+
+        async function fetchHighestScore() {
+            try {
+                const response = await fetch('/getHighestScoreKeeperGame');
+                const data = await response.json();
+                const highestScore = data.highest_score;
+                const userName = data.user_name;
+        
+                // Update highest score on the page
+                document.getElementById('highest-score').textContent = `Highest Score: ${highestScore} - ${userName}`;
+            } catch (error) {
+                console.error('Error fetching highest score:', error);
+                document.getElementById('highest-score').textContent = 'Highest Score: Error loading data';
+            }
+        }
+        fetchHighestScore();
+
+        async function savePersonalBest() {
+            try {
+                const userId = await getUserIdFromSession();  // Get user id from session
+                const response = await fetch('/savePersonalBestKeeperGame', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ user_id: userId, personal_best: personalBest })
+                });
+                const result = await response.json();
+                console.log('Personal Best saved:', result);
+            } catch (error) {
+                console.error('Error saving personal best:', error);
+            }
+        }
+
+        async function getUserIdFromSession() {
+            try {
+                const response = await fetch('/getUserId');  // Flask endpoint to get the user id from session
+                const data = await response.json();
+                return data.user_id;
+            } catch (error) {
+                console.error('Error fetching user ID from session:', error);
+                return null;
+            }
+        }
+
+        async function fetchPersonalBest() {
+            try {
+                const response = await fetch('/getPersonalBestKeeperGame');
+                const data = await response.json();
+        
+                if (data.personal_best !== undefined) {
+                    // Show personal best score
+                    personalBest = data.personal_best;
+                    personalBestDisplay.textContent = `Your Personal Best: ${personalBest}`;
+                } else {
+                    console.log('Error fetching personal best:', data.error);
+                }
+            } catch (error) {
+                console.error('Error fetching personal best:', error);
+            }
+        }
+
+        window.onload = function() {
+            fetchPersonalBest();
+        };
+
 
         // Настройка на размера на канваса
         function resizeCanvas() {
@@ -81,10 +167,6 @@
         }
 
         resizeCanvas();
-
-
-
-
 
         // Параметри на играта
         const ball = {
@@ -113,7 +195,7 @@
         const goalkeeper = {
             x: canvas.width / 2 - 50, // Начална позиция на вратаря (по средата на вратата)
             y: goal.y + 50, // Позиция спрямо височината на вратата
-            width: 50,
+            width:  50,
             height: 30,
             speed: 3, // Скорост на движение
             image: new Image(), // Добавяме ново изображение за вратаря
@@ -208,13 +290,18 @@
         function movGoalKeeper() {
             // Променяме позицията на вратаря спрямо скоростта и посоката
             goalkeeper.x += goalkeeper.speed * goalkeeperDirection;
-
+        
             // Проверяваме дали вратарят достига границите на вратата
-            if (goalkeeper.x <= goal.x || goalkeeper.x + goalkeeper.width >= goal.x + goal.width) {
-                // Смяна на посоката
-                goalkeeperDirection *= -1;
+            if (goalkeeper.x < goal.x) {
+                goalkeeper.x = goal.x; // Уверяваме се, че не излиза извън лявата граница
+                goalkeeperDirection = 1; // Смяна на посоката
             }
-        }         
+            if (goalkeeper.x + goalkeeper.width > goal.x + goal.width) {
+                goalkeeper.x = goal.x + goal.width - goalkeeper.width; // Уверяваме се, че не излиза извън дясната граница
+                goalkeeperDirection = -1; // Смяна на посоката
+            }
+        }
+              
 
 
         let isGoal = false;
@@ -280,11 +367,71 @@
             if (isGoal) {
                 score++;
                 scoreboard.textContent = `Goals: ${score}`;
+                
+                // Проверка за промяна на изображението и скоростта на вратаря
+                if (score == 10) {
+                    goalkeeper.image.src = '/static/images/goalkeeper2.png'; 
+                    goalkeeper.speed = 4; 
+                }
+                else if (score == 20)
+                {
+                    goalkeeper.image.src = '/static/images/goalkeeper3.png'; 
+                    goalkeeper.speed = 5; 
+                }
+                else if (score == 30)
+                {
+                    goalkeeper.image.src = '/static/images/goalkeeper4.png'; 
+                    goalkeeper.speed = 6; 
+                }
+                else if (score == 40)
+                {
+                    goalkeeper.image.src = '/static/images/goalkeeper5.png'; 
+                    goalkeeper.speed = 4; 
+                    goalkeeper.width = 70;
+                }
+                else if (score == 50)
+                {
+                    goalkeeper.image.src = '/static/images/goalkeeper6.png'; 
+                    goalkeeper.speed = 4; 
+                    goalkeeper.width = 90
+                }
+                else if (score == 60)
+                {
+                    goalkeeper.image.src = '/static/images/goalkeeper7.png'; 
+                    goalkeeper.speed = 5; 
+                    goalkeeper.width = 80
+                }
+                else if (score == 70)
+                {
+                    goalkeeper.image.src = '/static/images/goalkeeper8.png'; 
+                    goalkeeper.speed = 5; 
+                    goalkeeper.width = 100
+                }
+                else if (score == 80)
+                {
+                    goalkeeper.image.src = '/static/images/goalkeeper9.png'; 
+                    goalkeeper.speed = 4; 
+                    goalkeeper.width = 150
+                }
             } else {
+
+                if (score > personalBest) {
+                    personalBest = score;
+                    personalBestDisplay.textContent = `Your Personal Best: ${personalBest}`;
+                    
+                    // Save new personal best in the database
+                    savePersonalBest().catch(error => console.error('Error saving personal best:', error));
+                }
+
                 score = 0; // Ако не е вкаран гол, зануляваме резултата
                 scoreboard.textContent = `Goals: ${score}`;
+                
+                // Връщане към начално изображение и скорост
+                goalkeeper.image.src = '/static/images/goalkeeper1.png';
+                goalkeeper.speed = 3;
+                goalkeeper.width = 50;
             }
-
+        
             // Ресетваме топката до началната позиция
             ball.x = canvas.width / 2;
             ball.y = canvas.height - 250;
@@ -292,6 +439,7 @@
             ball.speedY = 0;
             ballMove = false; // Топката вече не се движи
         }
+        
 
         // Събития за мишката
         canvas.addEventListener('mousedown', (e) => {

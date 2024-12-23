@@ -25,6 +25,7 @@ class User(db.Model):
     max_passes_in_one_match = db.Column(db.Integer)
     max_hat_tricks = db.Column(db.Integer)
     max_ball_game_score = db.Column(db.Integer)
+    max_keeper_game_score = db.Column(db.Integer)
 
 
     # Метод за задаване на парола
