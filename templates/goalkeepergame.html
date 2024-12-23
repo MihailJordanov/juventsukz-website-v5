@@ -14,6 +14,8 @@
             height: 100vh;
             background-color: #7fc1f9;
             flex-direction: column; /* Струпваме елементите вертикално */
+            overflow: hidden; /* Забрана на превъртането */
+            touch-action: none; /* Изключване на стандартните жестове за докосване */
         }
         .back-button {
             position: absolute;
@@ -364,12 +366,14 @@
         });
 
         // Събития за тъчскрийн устройства
-        canvas.addEventListener('touchstart', (e) => {
+        canvas.addEventListener('touchstart', (event) => {
+
+            event.preventDefault();
             if (ballMove) return;
             isBallTouched = true;
 
             const rect = canvas.getBoundingClientRect();
-            const touch = e.touches[0];
+            const touch = event.touches[0];
             const mouseX = touch.clientX - rect.left;
             const mouseY = touch.clientY - rect.top;
 
@@ -381,11 +385,15 @@
             }
         });
 
-        canvas.addEventListener('touchmove', (e) => {
+        canvas.addEventListener('touchmove', (event) => {
+
+            if (event.target === canvas) {
+                event.preventDefault();
+            }
             if (ball.isDragging) {
                 isBallTouched = true;
                 const rect = canvas.getBoundingClientRect();
-                const touch = e.touches[0];
+                const touch = event.touches[0];
                 const mouseX = touch.clientX - rect.left;
                 const mouseY = touch.clientY - rect.top;
 
@@ -404,10 +412,12 @@
             }
         });
 
-        canvas.addEventListener('touchend', (e) => {
+        canvas.addEventListener('touchend', (event) => {
+
+            event.preventDefault();
             if (ball.isDragging) {
                 const rect = canvas.getBoundingClientRect();
-                const touch = e.changedTouches[0];
+                const touch = event.changedTouches[0];
                 const mouseX = touch.clientX - rect.left;
                 const mouseY = touch.clientY - rect.top;
 
